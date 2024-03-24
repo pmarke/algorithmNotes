@@ -1,0 +1,1542 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Multirotor Dynamics
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+During my reading on multirotor dynamics I have come across different models
+ which has caused me confusion.
+ This is my compilation of multirotor dynamics that I put together in order
+ to complete the picture of multirotor dynamics.
+ I have taken extensively from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Leishman2014a,Beard2008,Martin2010,Quinchia2013"
+
+\end_inset
+
+.
+ The core dynamics were derived in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+, and a simplification on the rotor drag was made in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Leishman2014a"
+
+\end_inset
+
+.
+ The frames and notation is taken from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Beard2008"
+
+\end_inset
+
+ which doesn't model the rotor drag.
+ The appendix of this note has information regarding sensors (only IMU currently
+).
+ The basic model of IMU sensor is taken from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Beard2008,Leishman2014a,Martin2010"
+
+\end_inset
+
+ which do not properly talk about the drift in noise bias.
+ The drift in noise bias and how to properly model it is addressed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Quinchia2013"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The multirotor dynamics presented in this note make the assumptions
+\end_layout
+
+\begin_layout Enumerate
+The model for a single propeller (not the multirotor) ignores higher-order
+ terms in linear and angular velocities.
+ This is valid near hovering, i.e.
+ for small linear and angular velocities.
+ Small velocities are with respect to the propeller/rotor tip speed.
+ If the ratio of the propeller's angular velocity is much larger than the
+ propeller's linear velocity, then this assumption holds.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The model for an individual propeller ignores linear and angular accelerations
+ on the propeller since their mass is very small compared to the mass of
+ the entire multirotor.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The velocity of the wind is assumed to be zero such that airspeed velocity
+ and ground velocity are the same.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Drag created by the frame is neglected since we assume it to be small as
+ small velocities.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multirotor Dynamics
+\end_layout
+
+\begin_layout Subsection
+Multirotor State Variables
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Beard2008"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+p_{n} & =\text{the inertial (north) position of the quadrotor along \ensuremath{\hat{i}^{i}}in \ensuremath{\mathcal{F}^{i}}}\\
+p_{e} & =\text{the inertial (east) position of the quadrotor along \ensuremath{\hat{j}^{i}}in \ensuremath{\mathcal{F}^{i}}}\\
+h & =\text{the altitude of the aircraft measured along \ensuremath{-\hat{k}^{i}}in \ensuremath{\mathcal{F}^{i}}}\\
+u & =\text{the body frame velocity measured along \ensuremath{\hat{i}^{b}}in \ensuremath{\mathcal{F}^{b}}}\\
+v & =\text{the body frame velocity measured along \ensuremath{\hat{j}^{b}}in \ensuremath{\mathcal{F}^{b}}}\\
+w & =\text{the body frame velocity measured along \ensuremath{\hat{k}^{b}}in \ensuremath{\mathcal{F}^{b}}}\\
+\phi & =\text{the roll angle defined with respect to \ensuremath{\mathcal{F}^{v2}} }\\
+\theta & =\text{the pitch angle defined with respect to \ensuremath{\mathcal{F}^{v1}} }\\
+\psi & =\text{the yaw angle defined with respect to \ensuremath{\mathcal{F}^{v}} }\\
+p & =\text{the roll rate measured along \ensuremath{\hat{i}^{b}} in \ensuremath{\mathcal{F}^{b}}}\\
+q & =\text{the pitch rate measured along \ensuremath{\hat{j}^{b}} in \ensuremath{\mathcal{F}^{b}}}\\
+r & =\text{the yaw rate measured along \ensuremath{\hat{k}^{b}} in \ensuremath{\mathcal{F}^{b}}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+6 Degrees of Freedom Model
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{p}_{n}\\
+\dot{p}_{e}\\
+-\dot{h}
+\end{bmatrix} & =R_{b}^{v}\begin{bmatrix}u\\
+v\\
+w
+\end{bmatrix}\label{eq:DynamicEquations}\\
+\begin{bmatrix}\dot{u}\\
+\dot{v}\\
+\dot{w}
+\end{bmatrix} & =\frac{1}{m}\begin{bmatrix}0\\
+0\\
+T
+\end{bmatrix}-\omega_{b/i}\times\begin{bmatrix}u\\
+v\\
+w
+\end{bmatrix}+\begin{bmatrix}-g\sin\theta\\
+g\cos\theta\sin\phi\\
+g\cos\theta\cos\phi
+\end{bmatrix}-\begin{bmatrix}\frac{\mu}{m}u\\
+\frac{\mu}{m}v\\
+0
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi}\\
+\dot{\theta}\\
+\dot{\psi}
+\end{bmatrix} & =\begin{bmatrix}1 & \sin\phi\tan\theta & \cos\phi\tan\theta\\
+0 & \cos\phi & -\sin\phi\\
+0 & \sin\phi\sec\theta & \cos\phi\sec\theta
+\end{bmatrix}\begin{bmatrix}p\\
+q\\
+r
+\end{bmatrix}\\
+\begin{bmatrix}\dot{p}\\
+\dot{q}\\
+\dot{r}
+\end{bmatrix} & =J^{-1}\left[M-\omega_{b/i}\times J\omega_{b/i}\right]
+\end{align}
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{subequations}
+\end_layout
+
+\end_inset
+
+where 
+\begin_inset Formula $M$
+\end_inset
+
+ is the moment vector in 
+\begin_inset Formula $\mathcal{F}^{b}$
+\end_inset
+
+, 
+\begin_inset Formula $T\in\mathbb{R}$
+\end_inset
+
+ is the total thrust produced by the propellers in 
+\begin_inset Formula $\mathcal{F}^{b}$
+\end_inset
+
+, 
+\begin_inset Formula $g\approx9.81m/s^{2}$
+\end_inset
+
+ is the gravitational constant, 
+\begin_inset Formula $\omega_{b/i}=\left[p,q,r\right]^{\top}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the rotor drag constant discussed in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Drag-force-enhanced-Quadrotor-Mo"
+
+\end_inset
+
+ .
+ The derivatives of the position can also be calculated as 
+\begin_inset Formula 
+\[
+\begin{bmatrix}\dot{p}_{n}\\
+\dot{p}_{e}\\
+\dot{h}
+\end{bmatrix}=\begin{bmatrix}\cos\theta\cos\psi & \sin\phi\sin\theta\cos\psi-\cos\phi\sin\psi & \cos\phi\sin\theta\cos\psi+\sin\phi\sin\psi\\
+\cos\theta\sin\psi & \sin\phi\sin\theta\sin\psi+\cos\phi\cos\psi & \cos\phi\sin\theta\sin\psi-\sin\phi\cos\psi\\
+\sin\theta & -\sin\phi\cos\theta & -\cos\phi\cos\theta
+\end{bmatrix}\begin{bmatrix}u\\
+v\\
+w
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the altitude term 
+\begin_inset Formula $\dot{h}$
+\end_inset
+
+ does not have a negative sign in front of it.
+\end_layout
+
+\begin_layout Subsection
+Forces and Moments
+\end_layout
+
+\begin_layout Standard
+This section will show how to convert the forces and moments to propeller
+ pwm commands.
+\end_layout
+
+\begin_layout Section
+Drag-force-enhanced Quadrotor Model
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Drag-force-enhanced-Quadrotor-Mo"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The rotor drag terms in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynamicEquations"
+
+\end_inset
+
+ are 
+\begin_inset Formula $\frac{\mu}{m}u$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{\mu}{m}v$
+\end_inset
+
+.
+ They are a simplified version of the rotor drag terms derived in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+.
+ In 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+, the rotor drag terms are 
+\begin_inset Formula 
+\begin{equation}
+\lambda\sum_{i=1}^{N}\omega_{i}V_{C}^{\perp}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+ is the angular speed of the 
+\begin_inset Formula $i$
+\end_inset
+
+th propeller, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a constant, 
+\begin_inset Formula $V_{C}^{\perp}$
+\end_inset
+
+ is the 
+\begin_inset Formula $i_{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $j_{b}$
+\end_inset
+
+components of the airspeed of the multirotor's center of mass, and 
+\begin_inset Formula $N$
+\end_inset
+
+ is the number of propellers.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Leishman2014a"
+
+\end_inset
+
+ makes the assumption that each propeller is spinning at about the same
+ rate.
+ Under this assumption they lump the terms 
+\begin_inset Formula $\lambda\sum_{i=1}^{N}\omega_{i}$
+\end_inset
+
+ together such that 
+\begin_inset Formula $\mu=\lambda\sum_{i=1}^{N}\omega_{i}$
+\end_inset
+
+, which implies
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\mu u\\
+\mu v\\
+0
+\end{bmatrix}=\lambda\sum_{i=1}^{N}\omega_{i}V_{C}^{\perp}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Appendix
+
+\end_layout
+
+\begin_layout Section
+Sensors
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Beard2008,Leishman2014"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Sensors do not necessarily give measurements in the NED frame.
+ Caution needs to be taken to ensure that the sensor measurements are converted
+ into the right frame.
+ For example, the Inven Sense IMU MPU-6000 is shown Figure 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "fig:Sensors_IMU"
+
+\end_inset
+
+.
+ The sensors in this section will assume that all measurements are in the
+ NED frame.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/IvenSenseIMU.png
+	width 80col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Sensors_IMU"
+
+\end_inset
+
+Shows the axis orientation for the accelerometer and the gyro scope.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Rate Gyros
+\end_layout
+
+\begin_layout Standard
+Rate gyros are typically part of an Inertia Measurement Unit (IMU) and are
+ triaxial.
+ This means that they measure rotation about the 
+\begin_inset Formula $i_{b}$
+\end_inset
+
+, 
+\begin_inset Formula $j_{b}$
+\end_inset
+
+ , and 
+\begin_inset Formula $k_{b}$
+\end_inset
+
+ axis.
+ The subscript 
+\begin_inset Formula $b$
+\end_inset
+
+ denotes the body frame of the rate gyro as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:RateGyro_meas"
+
+\end_inset
+
+; though we assume that all measurements are converted to NED.
+\end_layout
+
+\begin_layout Standard
+The output of a rate gyro is given by 
+\begin_inset Formula 
+\begin{equation}
+y_{gryo}=k_{gyro}\Omega+\beta_{gyro}+\eta_{gyro}\label{eq:RateGyro_meas}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $y_{gyro}$
+\end_inset
+
+ is in Volts, 
+\begin_inset Formula $k_{gyro}$
+\end_inset
+
+ is a gain, 
+\begin_inset Formula $\Omega$
+\end_inset
+
+ is the angular rate in radians per second, 
+\begin_inset Formula $\beta_{gyro}$
+\end_inset
+
+ is a bias term that drifts, and 
+\begin_inset Formula $\eta_{gyro}$
+\end_inset
+
+ is zero mean white noise process.
+ The gain 
+\begin_inset Formula $k_{gyro}$
+\end_inset
+
+ should be given on the spec sheet of the sensor.
+ The bias term 
+\begin_inset Formula $\beta_{acc}$
+\end_inset
+
+ is strongly dependent on temperature and should be calibrated prior to
+ each flight.
+ The calibration before each flight should estimate the initial bias which
+ is the turn on bias.
+ 
+\end_layout
+
+\begin_layout Standard
+If the turn on bias is estimated 
+\begin_inset Formula $\hat{\beta}_{gyro}$
+\end_inset
+
+, then we can cancel out the turn on bias in the output to get 
+\begin_inset Formula 
+\begin{equation}
+y_{gryo}=k_{gyro}\Omega+\tilde{\beta}_{gyro}+\eta_{gyro}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\beta}_{gyro}=\beta_{gryo}-\hat{\beta}_{gryo}$
+\end_inset
+
+ .
+ 
+\begin_inset Formula $\tilde{\beta}_{gyro}$
+\end_inset
+
+ is a function of a random variable that slowly changes with time.
+ Most estimators will constantly update 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ so that 
+\begin_inset Formula $\tilde{\beta}$
+\end_inset
+
+ is zero mean.
+\end_layout
+
+\begin_layout Standard
+Since we are interested in measuring the angular rates we get
+\begin_inset Formula 
+\begin{align}
+\hat{\Omega} & =\frac{1}{k_{gyro}}y_{gryo}\\
+ & =\frac{1}{k_{gryo}}\left(k_{gryo}\Omega+\tilde{\beta}_{gryo}+\eta_{gryo}\right)\\
+ & =\Omega+\frac{1}{k_{gryo}}\tilde{\beta}_{gyro}+\frac{1}{k_{gryo}}\eta_{gryo}
+\end{align}
+
+\end_inset
+
+If the estimate of 
+\begin_inset Formula $\hat{\beta}_{gryo}$
+\end_inset
+
+ is constantly updated and assumed accurate, then we can assume that 
+\begin_inset Formula $\tilde{\beta}_{gryo}$
+\end_inset
+
+ is negligible and the above equation is simplified to 
+\begin_inset Formula 
+\begin{equation}
+\hat{\Omega}=\Omega+\frac{1}{k_{gryo}}\eta_{gryo}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Accelerometers
+\end_layout
+
+\begin_layout Standard
+The output of the accelerometer is given by 
+\begin_inset Formula 
+\begin{equation}
+y_{acc}=k_{acc}A+\beta_{acc}+\eta_{acc}\label{eq:Accel_meas}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $y_{acc}$
+\end_inset
+
+ is in Volts, 
+\begin_inset Formula $k_{acc}$
+\end_inset
+
+ is a gain, 
+\begin_inset Formula $A$
+\end_inset
+
+ is the the difference between the acceleration of the vehicle and gravitational
+ acceleration, 
+\begin_inset Formula $\beta_{acc}$
+\end_inset
+
+ is a bias term that slowly drifts, and 
+\begin_inset Formula $\eta_{acc}$
+\end_inset
+
+ is zero mean white noise.
+ The gain 
+\begin_inset Formula $k_{acc}$
+\end_inset
+
+ should be given on the spec sheet of the sensor.
+ The bias term 
+\begin_inset Formula $\beta_{acc}$
+\end_inset
+
+ is strongly dependent on temperature and should be calibrated prior to
+ each flight.
+ The calibration before each flight should estimate the initial bias which
+ is the turn on bias.
+ 
+\end_layout
+
+\begin_layout Standard
+If the turn on bias is estimated 
+\begin_inset Formula $\hat{\beta}_{gyro}$
+\end_inset
+
+, then we can cancel out the turn on bias in the output to get
+\begin_inset Formula 
+\begin{equation}
+y_{acc}=k_{gyro}A+\tilde{\beta}_{acc}+\eta_{acc}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\beta}_{gyro}=\beta_{gryo}-\hat{\beta}_{gryo}$
+\end_inset
+
+ .
+ 
+\begin_inset Formula $\tilde{\beta}_{gyro}$
+\end_inset
+
+ is a function of a random variable that slowly changes with time.
+ Most estimators will constantly update 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ so that 
+\begin_inset Formula $\tilde{\beta}$
+\end_inset
+
+ is zero mean.
+ 
+\end_layout
+
+\begin_layout Standard
+Since we are interested in measuring the linear accelerations we get
+\begin_inset Formula 
+\begin{align}
+\hat{A} & =\frac{1}{k_{acc}}y_{acc}\\
+ & =\frac{1}{k_{acc}}\left(k_{acc}A+\tilde{\beta}_{acc}+\eta_{acc}\right)\\
+ & =A+\frac{1}{k_{acc}}\tilde{\beta}_{acc}+\frac{1}{k_{acc}}\eta_{acc}
+\end{align}
+
+\end_inset
+
+If the estimate of 
+\begin_inset Formula $\hat{\beta}_{acc}$
+\end_inset
+
+ is constantly update and assumed accurate, then we can assume that 
+\begin_inset Formula $\tilde{\beta}_{acc}$
+\end_inset
+
+ is negligible and the above equation is simplified to 
+\begin_inset Formula 
+\begin{equation}
+\hat{A}=A+\frac{1}{k_{acc}}\eta_{acc}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+What is 
+\begin_inset Formula $A$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $A$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Accel_meas"
+
+\end_inset
+
+ is the the difference between the acceleration of the vehicle and gravitational
+ acceleration in 
+\begin_inset Formula $\mathcal{F}^{b}$
+\end_inset
+
+ and defined as
+\begin_inset Formula 
+\[
+A=\frac{1}{m}\left(F_{T}-F_{g}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $m$
+\end_inset
+
+ is the mass of the system, 
+\begin_inset Formula $F_{T}$
+\end_inset
+
+ are all of the external forces acting on the chassis, and 
+\begin_inset Formula $F_{g}$
+\end_inset
+
+ is the gravitational force in 
+\begin_inset Formula $\mathcal{F}^{b}$
+\end_inset
+
+ defined with an NED coordinate system in 
+\begin_inset Formula $\mathcal{F}^{i}$
+\end_inset
+
+.
+ The total force 
+\begin_inset Formula $F_{T}$
+\end_inset
+
+ includes not only the force from translational acceleration but from rotation
+ about the axis.
+ Thus linear acceleration is 
+\begin_inset Formula 
+\begin{equation}
+m\dot{v}=F_{t}-m\omega_{b/i}\times v+F_{g}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $v$
+\end_inset
+
+ is the linear velocity in 
+\begin_inset Formula $\mathcal{F}^{b}$
+\end_inset
+
+, 
+\begin_inset Formula $\omega$
+\end_inset
+
+ is the angular rate, 
+\begin_inset Formula $m$
+\end_inset
+
+ is the mass of the system, and 
+\begin_inset Formula $F_{t}$
+\end_inset
+
+ is the force due to thrust or normal force if it is resting on the ground.
+ We can now write 
+\begin_inset Formula $A$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+A=\dot{v}+\omega_{b/i}\times v-F_{g}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Another form for it, according to 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Martin2010"
+
+\end_inset
+
+, is 
+\begin_inset Formula 
+\begin{equation}
+A=\begin{bmatrix}-\frac{\mu}{m}u\\
+-\frac{\mu}{m}v\\
+-\frac{T}{m}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+which gives us a way to directly estimate the coefficient 
+\begin_inset Formula $\mu$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Accelerometer-based Attitude Estimation
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Leishman2014"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+One approach to estimate the attitude of the system is to use 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Accel_meas"
+
+\end_inset
+
+.
+ When the total external forces on the chassis sum to zero, then the acceleromet
+er measures
+\begin_inset Formula 
+\begin{equation}
+A=-\frac{1}{m}F_{g}\label{eq:accelerometer_meas_gravity-1}
+\end{equation}
+
+\end_inset
+
+which is the force due to gravity on the proof mass.
+ Let 
+\begin_inset Formula $A_{m}^{b}\triangleq\left[a_{i},a_{j},a_{k}\right]^{\top}$
+\end_inset
+
+, represent the acceleration measured in the body-frame axes.
+ In the inertial frame, the force of gravity is 
+\begin_inset Formula $F_{g}=\left[0,0,mg\right]^{\top}$
+\end_inset
+
+.
+ Expressing 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:accelerometer_meas_gravity-1"
+
+\end_inset
+
+ in the body frame gives
+\begin_inset Formula 
+\begin{align*}
+\begin{bmatrix}a_{i}\\
+a_{j}\\
+a_{k}
+\end{bmatrix} & =R_{i}^{b}\begin{bmatrix}0\\
+0\\
+-g
+\end{bmatrix}\\
+ & =\begin{bmatrix}g\sin\theta\\
+-g\sin\phi\cos\theta\\
+-g\cos\phi\cos\theta
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the pitch angle about the 
+\begin_inset Formula $j_{b}$
+\end_inset
+
+ axis, and 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is the roll angle about the 
+\begin_inset Formula $i_{v2}$
+\end_inset
+
+ axis.
+ The roll and pitch angles can therefore be estimated as
+\begin_inset Formula 
+\begin{align}
+\hat{\phi} & =\tan^{-1}\left(\frac{a_{j}}{a_{k}}\right)\\
+\hat{\theta} & =\sin^{-1}\left(\frac{q_{i}}{g}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the underlying assumption of zero external forces is rarely satisfied;
+ however, it can still serve as a good estimator.
+\end_layout
+
+\begin_layout Subsection
+GPS
+\end_layout
+
+\begin_layout Standard
+====
+\end_layout
+
+\begin_layout Section
+Sensor Bias
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Sensor-Bias"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Sensor bias 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is never deterministic; rather it slowly drifts over time.
+ This section will introduce sever sensor bias models described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Quinchia2013"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+First order Gauss-Markov (GM)
+\end_layout
+
+\begin_layout Standard
+This model is widely used because it is able to represent a large number
+ of physical processes and it is a relatively simple model.
+ The continuous model is 
+\begin_inset Formula 
+\begin{equation}
+\dot{x}=-\frac{1}{T_{c}}x+w
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $x$
+\end_inset
+
+ is a random process with zero mean, correlation time, 
+\begin_inset Formula $T_{c}$
+\end_inset
+
+, and driven noise, 
+\begin_inset Formula $w$
+\end_inset
+
+.
+ 
+\begin_inset Formula $w$
+\end_inset
+
+ is zero mean white noise with covariance 
+\begin_inset Formula 
+\begin{equation}
+\sigma_{w}^{2}=2\frac{1}{T_{c}}\sigma_{x}^{2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{x}^{2}=\sigma_{GM}^{2}$
+\end_inset
+
+ is the standard deviation of the process.
+\end_layout
+
+\begin_layout Standard
+The corresponding discrete time equation can be written as
+\begin_inset Formula 
+\begin{equation}
+x_{k}=\left(1-\frac{\Delta t}{T_{c}}\right)x_{k-1}+w_{k}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ is the sampling time and 
+\begin_inset Formula $w_{k}$
+\end_inset
+
+ is a white noise with noise covariance
+\begin_inset Formula 
+\begin{equation}
+\sigma_{w_{k}}^{2}=\sigma_{x_{k}}^{2}\left(1-e^{-2\Delta t/T_{c}}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The correlation time 
+\begin_inset Formula $T_{c}$
+\end_inset
+
+ and the covariance of the process 
+\begin_inset Formula $\sigma_{x}^{2}$
+\end_inset
+
+ are obtained by Allan variance.
+\end_layout
+
+\begin_layout Subsection
+Random Walk (RW)
+\end_layout
+
+\begin_layout Standard
+This model captures the idea that the signal randomly walks or drifts.
+ The model is 
+\begin_inset Formula 
+\[
+\dot{x}=w
+\]
+
+\end_inset
+
+ or in discrete
+\begin_inset Formula 
+\[
+x_{k}=x_{k-1}+w_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $w$
+\end_inset
+
+ is a white noise with noise covariance 
+\begin_inset Formula $q_{k}=q\left(t_{k+1}-t_{k}\right)=\sigma_{RW}^{2}\Delta t$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+GM+RW+WN Bias
+\end_layout
+
+\begin_layout Standard
+A typical bias drift of an inertial sensor can be represented as a combination
+ of GM, RW, and white noise (WN).
+ The discrete form is 
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}x_{1}\\
+x_{2}
+\end{bmatrix}_{k} & =\begin{bmatrix}\left(1-\frac{\Delta t}{T_{c}}\right) & 0\\
+0 & 1
+\end{bmatrix}\begin{bmatrix}x_{1}\\
+x_{2}
+\end{bmatrix}_{k-1}+\begin{bmatrix}\sigma_{GM}\sqrt{1-e^{-2\Delta t/T_{c}}}\\
+\sigma_{RM}\sqrt{\Delta t}
+\end{bmatrix}w_{k}\\
+y_{k} & =\begin{bmatrix}1 & 1\end{bmatrix}\begin{bmatrix}x_{1}\\
+x_{2}
+\end{bmatrix}_{k}+\left(\sigma_{WN}/\sqrt{\Delta t}\right)v_{k}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{WN}$
+\end_inset
+
+ is the standard deviation of the white noise process and 
+\begin_inset Formula $y_{k}$
+\end_inset
+
+ is the result of combining WN, RW and first order GM.
+ The bias drift would be 
+\begin_inset Formula $y_{k}$
+\end_inset
+
+ in this case.
+\end_layout
+
+\begin_layout Subsection
+Auto Regression Model (AR)
+\end_layout
+
+\begin_layout Standard
+The Auto Regressive process is described as 
+\begin_inset Formula 
+\begin{equation}
+x\left(n\right)=-\sum_{k=1}^{p}\alpha_{k}x\left(n-k\right)+\sigma_{AR}w\left(n\right)
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $x\left(n\right)$
+\end_inset
+
+ is the process output, which is a combination of past outputs, plus a white
+ noise, 
+\begin_inset Formula $w\left(n\right)$
+\end_inset
+
+, with standard deviation 
+\begin_inset Formula $\sigma_{AR}$
+\end_inset
+
+; 
+\begin_inset Formula $p$
+\end_inset
+
+ is the order of the AR process and 
+\begin_inset Formula $\alpha_{k}$
+\end_inset
+
+ are the model parameters.
+ The above equation can be expressed in state space form.
+ For example, and AR process with 
+\begin_inset Formula $p=3$
+\end_inset
+
+ can be modeled in state space (SS) form as 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}x_{1}\\
+x_{2}\\
+x_{3}
+\end{bmatrix}_{n}=\begin{bmatrix}0 & 1 & 0\\
+0 & 0 & 1\\
+-\alpha_{1} & -\alpha_{2} & -\alpha_{3}
+\end{bmatrix}\begin{bmatrix}x_{1}\\
+x_{2}\\
+x_{3}
+\end{bmatrix}_{n-1}+\begin{bmatrix}0\\
+0\\
+\sigma_{AR}
+\end{bmatrix}w\left(n\right)
+\end{equation}
+
+\end_inset
+
+This is the bias model for one of the inertial sensor axis.
+ Since an IMU has 6 axis, you would need 6 of these models.
+ 
+\end_layout
+
+\begin_layout Standard
+It should be noted that if 
+\begin_inset Formula $p=1$
+\end_inset
+
+, then the AR process approximates a first order GM process.
+ If 
+\begin_inset Formula $p=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{1}=-1$
+\end_inset
+
+, then the AR process approximates a RW.
+ And if 
+\begin_inset Formula $p=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{1}=0$
+\end_inset
+
+, then it would be be a white noise process.
+ It is recommended to use a third order model because higher order models
+ aren't necessarily stable.
+\end_layout
+
+\begin_layout Standard
+The coefficients of this process can be estimated using Burg's method.
+\end_layout
+
+\begin_layout Section
+Identifying Stochastic Model Parameters for Bias Drift Estimation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Identifying-Stochastic-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+I refer you to 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "Section 4"
+key "Quinchia2013"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+These methods assume that you have gathered a lot of imu data with the initial
+ bias removed.
+ 
+\end_layout
+
+\begin_layout Subsection
+Autocorrelation
+\end_layout
+
+\begin_layout Standard
+This method is used to obtain parameters for modeling the first order GM
+ process.
+ The autocorrelation function is 
+\begin_inset Formula 
+\begin{equation}
+R_{xx}\left(\tau\right)=\sigma^{2}e^{\frac{\left|\tau\right|}{T_{c}}}
+\end{equation}
+
+\end_inset
+
+which is calculated from 
+\begin_inset Formula 
+\begin{equation}
+E\left[x\left(t_{1}\right)x\left(t_{1}+\tau\right)\right]
+\end{equation}
+
+\end_inset
+
+If the autocorrelation resemble the one in 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "Figure 4"
+key "Quinchia2013"
+
+\end_inset
+
+, then a GM can properly model the bias.
+ If it cannot, then you will need to use a different model.
+\end_layout
+
+\begin_layout Subsection
+Autoregressive Process
+\end_layout
+
+\begin_layout Standard
+You can use Burg's method to estimate the coefficients of the AR model.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Quinchia2013"
+
+\end_inset
+
+ suggests using third order models since they are a good balance between
+ reliable modeling, stability, and computational efficiency.
+ This method is also used after applying wavelet de-noising to the static
+ inertial sensor data.
+\end_layout
+
+\begin_layout Subsection
+Allan Variance
+\end_layout
+
+\begin_layout Standard
+The AV method helps in identifying the source of a given noise term in the
+ observed data.
+ The AV is estimated as follows
+\begin_inset Formula 
+\begin{equation}
+\sigma^{2}\left(T\right)=\frac{1}{2T^{2}\left(N-2n\right)}\sum_{k=1}^{N-2n}\left(\theta_{k+2n}-2\theta_{k+n}+\theta_{k}\right)^{2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $T$
+\end_inset
+
+ represents the time window associated with a group of 
+\begin_inset Formula $n$
+\end_inset
+
+ consecutive observed data samples, 
+\begin_inset Formula $N$
+\end_inset
+
+ is the length of the data that will be analyzed and 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the output velocity, in the case of accelerometers, and output angle,
+ in the case of the gyros.
+\end_layout
+
+\begin_layout Standard
+The basic idea is to take a long sequence of data 
+\begin_inset Formula $N$
+\end_inset
+
+ over the time interval 
+\begin_inset Formula $T$
+\end_inset
+
+, and remove the turn on bias.
+ Then you integrate the noise to calculate 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+ Next you divide the data 
+\begin_inset Formula $N$
+\end_inset
+
+ into three consecutive groups of size 
+\begin_inset Formula $n=N/3$
+\end_inset
+
+.
+ You then simple calculate the AV value.
+\end_layout
+
+\begin_layout Subsection
+Wavelet De-Noising
+\end_layout
+
+\begin_layout Standard
+A method used to remove short term noises in a signal.
+ Then you can use the Autocorrelation, Burg's method, or Allan Variance
+ to calculate the parameters for the noise model.
+\backslash
+
+\end_layout
+
+\begin_layout Subsection
+Allan Variance Wavelet De-Noising
+\end_layout
+
+\begin_layout Standard
+In 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Quinchia2013"
+
+\end_inset
+
+, it was shown that a 3rd order AR process computed using the Allan Variance
+ method on IMU data processed by the Wavelet De-Noising did the best.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/mark/Documents/mendeley/library"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

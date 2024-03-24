@@ -1,0 +1,881 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Image Sphere Dynamics
+\end_layout
+
+\begin_layout Author
+Mark Petersen
+\end_layout
+
+\begin_layout Abstract
+These notes will present the dynamics of a point measurement on an image
+ sphere expressed in the camera's body frame.
+ These notes follow the derivation in the journal paper 
+\begin_inset Quotes eld
+\end_inset
+
+Dynamic Image-Based Visual Servo Control Using Centroid and Optic Flow Features
+\begin_inset Quotes erd
+\end_inset
+
+ by R.
+ Mahony which assume a stationary target; however, these notes do not assume
+ a stationary target.
+ These notes will also follow the conference paper 
+\begin_inset Quotes eld
+\end_inset
+
+Hovering flight and vertical landing control of a VTOL Unmanned Aerial Vehicle
+ using Optical Flow
+\begin_inset Quotes erd
+\end_inset
+
+ by Bruno Herisse.
+\end_layout
+
+\begin_layout Section
+Camera Dynamics
+\end_layout
+
+\begin_layout Standard
+Consider a camera capable of rotational and translational motion.
+ Let 
+\begin_inset Formula $R_{b}^{i}\in SO\left(3\right)$
+\end_inset
+
+ denote the rotation matrix from the body frame to the inertial frame, and
+ let 
+\begin_inset Formula $w_{b/i}^{b}$
+\end_inset
+
+ denote the angular velocity of the camera with respect to inertial coordinates
+ expressed in the body frame of the camera.
+ Then the rotational kinematics are give by
+\begin_inset Formula 
+\[
+\dot{R}_{b}^{i}=R_{b}^{i}w_{b/i}^{b^{\land}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $w^{\land}$
+\end_inset
+
+ is the skew symmetric matrix
+\begin_inset Formula 
+\[
+w^{\land}=\begin{bmatrix}0 & -w_{3} & w_{2}\\
+w_{3} & 0 & -w_{1}\\
+-w_{2} & w_{1} & 0
+\end{bmatrix}.
+\]
+
+\end_inset
+
+Let 
+\begin_inset Formula $p_{b/i}^{i}$
+\end_inset
+
+ denote the position of the camera's body frame with respect to the inertial
+ frame expressed in inertial coordinate, and let 
+\begin_inset Formula $v_{b/i}^{b}$
+\end_inset
+
+ denote the velocity of the camera with respect to the inertial frame expressed
+ in the body frame.
+ Then the translational kinematics are given by
+\begin_inset Formula 
+\[
+\dot{p}_{b/i}^{i}=R_{b}^{i}v_{b/i}^{b}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $J$
+\end_inset
+
+ denote the mass and inertia of the camera, 
+\begin_inset Formula $g$
+\end_inset
+
+ the gravitational force, 
+\begin_inset Formula $F$
+\end_inset
+
+ other forces applied to the camera, and 
+\begin_inset Formula $\tau$
+\end_inset
+
+ torque applied to the camera.
+ Then the dynamics of the camera are
+\begin_inset Formula 
+\begin{align*}
+\dot{p}_{b/i}^{i} & =R_{b}^{i}v_{b/i}^{b}\\
+m\dot{v}_{b/i}^{b} & =-mw_{b/i}^{b^{\land}}v_{b/i}^{b}+mgR_{b}^{i^{\top}}e_{3}+F\\
+\dot{R}_{b}^{i} & =R_{b}^{i}w_{b/i}^{b^{\land}}\\
+J\dot{w}_{b/i}^{b} & =-w_{b/i}^{b^{\land}}Jw_{b/i}^{b}+\tau
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Target Dynamics
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $p_{t/i}^{i}$
+\end_inset
+
+ denote the target's position with respect to the inertial frame expressed
+ in the inertial frame, let 
+\begin_inset Formula $p_{b/i}^{b}$
+\end_inset
+
+ denote the camera's position with respect to the inertial frame expressed
+ in the camera's body frame, and let 
+\begin_inset Formula $R_{i}^{b}$
+\end_inset
+
+ denote the rotation from the inertial frame to the body frame which has
+ the dynamics
+\begin_inset Formula 
+\begin{align*}
+R_{i}^{b} & =\left(R_{b}^{i}\right)^{\top}\\
+\dot{R}_{i}^{b} & =\left(\dot{R}_{b}^{i}\right)^{\top}\\
+ & =\left(R_{b}^{i}w_{b/i}^{b^{\land}}\right)^{\top}\\
+ & =-w_{b/i}^{b^{\land}}R_{b}^{i^{\top}}\\
+ & =-w_{b/i}^{b^{\land}}R_{i}^{b}
+\end{align*}
+
+\end_inset
+
+.
+ Then the target's dynamics with respect to the body frame are
+\begin_inset Formula 
+\begin{align*}
+p_{t/b}^{b} & =R_{i}^{b}p_{t/i}^{i}-R_{i}^{b}p_{b/i}^{i}\\
+\dot{p}_{t/b}^{b} & =\dot{R}_{i}^{b}p_{t/i}^{i}+R_{i}^{b}\dot{p}_{t/i}^{i}-\dot{R}_{i}^{b}p_{b/i}^{i}-R_{i}^{b}\dot{p}_{b/i}^{i}\\
+ & =-w_{b/i}^{b^{\land}}R_{i}^{b}p_{t/i}^{i}+\dot{p}_{t/i}^{b}+w_{b/i}^{b^{\land}}R_{i}^{b}p_{b/i}^{i}-\dot{p}_{b/i}^{b}\\
+ & =-w_{b/i}^{b^{\land}}\left(R_{i}^{b}p_{t/i}^{i}-R_{i}^{b}p_{b/i}^{i}\right)+\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}\\
+ & =-w_{b/i}^{b^{\land}}\left(p_{t/b}^{b}\right)+\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Image Dynamics
+\end_layout
+
+\begin_layout Standard
+The projection of the target onto the unit sphere expressed in the camera's
+ body frame is
+\begin_inset Formula 
+\begin{align*}
+m^{b} & =\frac{p_{t/b}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }\\
+\dot{m}^{b} & =\frac{\dot{p}_{t/b}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }-\frac{p_{t/b}^{b}\left(p_{t/b}^{b}\right)^{\top}\dot{p}_{t/b}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert ^{3}}\\
+ & =\left(I_{3x3}-m^{b}m^{b^{\top}}\right)\frac{\dot{p}_{t/b}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }\\
+ & =\Pi_{m^{b}}\frac{-w_{b/i}^{b^{\land}}\left(p_{t/b}^{b}\right)+\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }\\
+ & =-\Pi_{m^{b}}w_{b/i}^{b^{\land}}m^{b}+\Pi_{m^{b}}\frac{\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }\\
+ & =-\Pi_{m^{b}}w_{b/i}^{b^{\land}}m^{b}+\Pi_{m^{b}}\frac{\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }\\
+ & =-w_{b/i}^{b^{\land}}m^{b}+\Pi_{m^{b}}\frac{\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Pi_{m^{b}}=\left(I_{3x3}-m^{b}m^{b^{\top}}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\Pi_{m^{b}}w_{b/i}^{b^{\land}}m^{b}=w_{b/i}^{b^{\land}}m^{b}$
+\end_inset
+
+ since 
+\begin_inset Formula $<w_{b/i}^{b^{\land}}m^{b},m^{b}>=0$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\dot{m}^{b}$
+\end_inset
+
+ is the optical flow through the point 
+\begin_inset Formula $m^{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Optical Flow
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/OpticFlow.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+This figure shows a camera above the target plane.
+ 
+\begin_inset Formula $I$
+\end_inset
+
+ denotes the inertial frame.
+ 
+\begin_inset Formula $B$
+\end_inset
+
+ denotes the camera frame.
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+ denotes the camera's field of view angle.
+ 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is the unit vector tangent to the target plane pointing down into the earth.
+ 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ denotes the angle between 
+\begin_inset Formula $\eta$
+\end_inset
+
+ and the target point 
+\begin_inset Formula $P_{t}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $d$
+\end_inset
+
+ is the distance along the z-axis in the inertial frame between the target
+ plane and the origin of the body frame.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:TargetPlane"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the first portion, assume that the world is flat and that all of the
+ points 
+\begin_inset Formula $P_{t}$
+\end_inset
+
+ lie on the same plane called the target plane.
+ Looking at figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:TargetPlane"
+
+\end_inset
+
+, 
+\begin_inset Formula $I$
+\end_inset
+
+ denotes the inertial frame.
+ 
+\begin_inset Formula $B$
+\end_inset
+
+ denotes the camera frame.
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+ denotes the camera's field of view angle.
+ 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is the unit vector tangent to the target plane pointing down into the earth.
+ 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ denotes the angle between 
+\begin_inset Formula $\eta$
+\end_inset
+
+ and the target point 
+\begin_inset Formula $P_{t}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $d$
+\end_inset
+
+ is the distance along the z-axis in the inertial frame between the target
+ plane and the camera.
+\end_layout
+
+\begin_layout Standard
+The optical flow 
+\begin_inset Formula $\dot{m}^{b}$
+\end_inset
+
+ has rotational and translational componenets.
+ The optical flow due to rotation is 
+\begin_inset Formula $-w_{b/i}^{b^{\land}}m^{b}$
+\end_inset
+
+ and the optical flow due to translation is 
+\begin_inset Formula $\Pi_{m^{b}}\frac{\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }$
+\end_inset
+
+.
+ One could easily measure the optical flow 
+\begin_inset Formula $\dot{m}^{b}$
+\end_inset
+
+ and optical flow due to rotation 
+\begin_inset Formula $-w_{b/i}^{b^{\land}}m^{b}$
+\end_inset
+
+ to calculate the optical flow due to translation.
+\begin_inset Formula 
+\begin{equation}
+\Pi_{m^{b}}\frac{\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}}{\left\Vert p_{t/b}^{b}\right\Vert }=\dot{m}^{b}+w_{b/i}^{b^{\land}}m^{b}\label{eq:translation1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The optical flow due to translation can be written differently.
+ First note that
+\begin_inset Formula 
+\begin{align}
+d\left(t\right) & =<\eta^{i},-p_{c/i}^{i}>\nonumber \\
+ & =<\eta^{i},p_{t/i}^{i}-p_{c/i}^{i}>\nonumber \\
+ & =<R_{b}^{i}\eta^{b},R_{b}^{i}\left(p_{t/i}^{b}-p_{c/i}^{b}\right)>\nonumber \\
+ & =<\eta^{b},p_{t/i}^{b}-p_{c/i}^{b}>\nonumber \\
+ & =<\eta^{b},p_{t/i}^{b}>\nonumber \\
+ & =<\eta^{b},m^{b}>\left\Vert p_{t/i}^{b}\right\Vert \label{eq:distance}
+\end{align}
+
+\end_inset
+
+using the fact that
+\begin_inset Formula $<\eta^{i},p_{t/i}^{i}>=0$
+\end_inset
+
+ and
+\begin_inset Formula $<\eta^{b},p_{c/i}^{b}>=0$
+\end_inset
+
+.
+ Rearranging equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:distance"
+
+\end_inset
+
+yields
+\begin_inset Formula 
+\begin{equation}
+\left\Vert p_{t/i}^{b}\right\Vert =\frac{d\left(t\right)}{<\eta^{b},m^{b}>}=\frac{d\left(t\right)}{\cos\left(\alpha\right)}.\label{eq:distance2}
+\end{equation}
+
+\end_inset
+
+substituting equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:distance2"
+
+\end_inset
+
+into 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:translation1"
+
+\end_inset
+
+yields
+\begin_inset Formula 
+\begin{equation}
+\Pi_{m^{b}}\cos\left(\alpha\right)\frac{\left(\dot{p}_{t/i}^{b}-\dot{p}_{b/i}^{b}\right)}{d\left(t\right)}=\dot{m}^{b}+w_{b/i}^{b^{\land}}m^{b}\label{eq:translation2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For simplicity, the rest of the calculations will be done in the camera's
+ body frame.
+ Let 
+\begin_inset Formula $p_{i}$
+\end_inset
+
+ be the ith point in the target plane with respect to the inertial frame
+ expressed in the body frame, 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ be the projection of 
+\begin_inset Formula $p_{i}$
+\end_inset
+
+ onto the image sphere, 
+\begin_inset Formula $\Pi_{m_{i}}=I-m_{i}m_{i}^{\top}$
+\end_inset
+
+, 
+\begin_inset Formula $c$
+\end_inset
+
+ be the position of the camera with respect to the inertial frame expressed
+ in the body frame, 
+\begin_inset Formula $\cos\left(\alpha\right)=<\eta^{b},m_{i}>$
+\end_inset
+
+, and 
+\begin_inset Formula $w^{\land}=w_{b/i}^{b^{\land}}$
+\end_inset
+
+.
+ Using these substitituions 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:translation2"
+
+\end_inset
+
+becomes
+\begin_inset Formula 
+\begin{equation}
+\Pi_{m_{i}}\cos\left(\alpha_{i}\right)\frac{\left(\dot{p}_{i}-\dot{c}\right)}{d\left(t\right)}=\dot{m_{i}}+w^{\land}m_{i}\label{eq:translation3}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We are interested in solving for 
+\begin_inset Formula $Y\left(t\right)=\frac{\left(\dot{p}_{i}-\dot{c}\right)}{d\left(t\right)}$
+\end_inset
+
+; however, 
+\begin_inset Formula $\Pi_{m_{i}}\cos\left(\alpha_{i}\right)$
+\end_inset
+
+ is not invertible for a single point.
+ However, if multiple points are taken such that 
+\begin_inset Formula $q=\sum_{i=1}^{n}p_{i}\in\mathbb{R}^{3}$
+\end_inset
+
+, then equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:translation3"
+
+\end_inset
+
+can be changed to 
+\begin_inset Formula 
+\begin{align}
+QY\left(t\right) & =\dot{q}+w^{\land}q\nonumber \\
+Y\left(t\right) & =Q^{-1}\left(\dot{q}+w^{\land}q\right)\label{eq:Wt}
+\end{align}
+
+\end_inset
+
+ where 
+\begin_inset Formula 
+\[
+Q=\sum_{i=1}^{n}\Pi_{m_{i}}\cos\left(\alpha_{i}\right)
+\]
+
+\end_inset
+
+and is invertible if 
+\begin_inset Formula $i>1$
+\end_inset
+
+ and the measurements 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ are different.
+ 
+\end_layout
+
+\begin_layout Standard
+Equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Wt"
+
+\end_inset
+
+is not ideal since it suffers from noise in 
+\begin_inset Formula $\dot{q}$
+\end_inset
+
+ and ill conditioned 
+\begin_inset Formula $Q$
+\end_inset
+
+ with few measurements.
+ However, the more points used in equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Wt"
+
+\end_inset
+
+, the better the estimation of 
+\begin_inset Formula $Q$
+\end_inset
+
+ becomes.
+ So a better measurement of 
+\begin_inset Formula $W\left(t\right)$
+\end_inset
+
+ is obtained by obtained by integrating the observed optic flow a window
+ 
+\begin_inset Formula $W$
+\end_inset
+
+ specified by the camea's field of view.
+ We can do this by integrating three seperate portions.
+\begin_inset Formula 
+\begin{align}
+\Phi & =\int\int_{W}\dot{p}dp\label{eq:7}\\
+\Gamma & =\int\int_{W}w^{\land}m_{i}dp\label{eq:8}\\
+\Theta & =\int\int_{W}\Pi_{m_{i}}\cos\left(\alpha_{i}\right)dp\label{eq:9}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To simplify this process, we will use a change of basis to polar coordinates
+ so that 
+\begin_inset Formula 
+\[
+m_{i}=R_{i}^{b}\begin{bmatrix}\sin\theta\cos\phi\\
+\sin\theta\sin\phi\\
+\cos\theta
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\cos\left(\alpha_{i}\right) & =<R_{i}^{b}m_{i},e_{3}>\\
+ & =\begin{bmatrix}0 & 0 & 1\end{bmatrix}\begin{bmatrix}\sin\theta\cos\phi\\
+\sin\theta\sin\phi\\
+\cos\theta
+\end{bmatrix}\\
+ & =\cos\left(\theta\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+dp=\sin\left(\theta\right)d\theta d\phi
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using this change of basis, equations
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:7"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:9"
+
+\end_inset
+
+ become
+\begin_inset Formula 
+\begin{align}
+\Phi & =\int\int_{W}\dot{p}\sin\left(\theta\right)d\theta d\phi\label{eq:10}\\
+\Gamma & =\int\int_{W}w^{\land}m_{i}\sin\left(\theta\right)d\theta d\phi\label{eq:11}\\
+\Theta & =\int\int_{W}\Pi_{m_{i}}\cos\left(\theta\right)\sin\left(\theta\right)d\theta d\phi\label{eq:12}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, assume that you have a fish eye camera that can see the entire
+ lower hemisphere regardless of orientation and you want to calculate the
+ optical flow in just the lower hemisphere.
+ This implies that the area of integration is the lower hemisphere.
+ If we rotate the area of integration to be centered around 
+\begin_inset Formula $e_{3}^{b}$
+\end_inset
+
+ by rotating all of the points 
+\begin_inset Formula $p_{i}$
+\end_inset
+
+ by 
+\begin_inset Formula $R_{i}^{b}$
+\end_inset
+
+ then 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\mbox{\Pi_{m_{i}}} & =I-R_{i}^{b}m_{i}m_{i}^{\top}R_{i}^{b^{\top}}\\
+ & =R_{i}^{b}IR_{b}^{i}-R_{i}^{b}m_{i}m_{i}^{\top}R_{b}^{i}\\
+ & =R_{i}^{b}\left(I-m_{i}m_{i}^{\top}\right)R_{i}^{b}\\
+ & =R_{i}^{b}\Pi_{m_{i}}^{i}R_{i}^{b}
+\end{align*}
+
+\end_inset
+
+and equations 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:10"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:12"
+
+\end_inset
+
+ become
+\begin_inset Formula 
+\begin{align}
+\Phi & =\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}R_{i}^{b}\dot{p}\sin\left(\theta\right)d\theta d\phi\\
+\Gamma & =\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}w^{\land}R_{i}^{b}m_{i}\sin\left(\theta\right)d\theta d\phi\\
+\Theta & =\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}R_{i}^{b}\Pi_{m_{i}}R_{b}^{i}\cos\left(\theta\right)\sin\left(\theta\right)d\theta d\phi
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Solving for 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\Gamma & =w^{\land}\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}m_{i}\sin\left(\theta\right)d\theta d\phi\\
+ & =w^{\land}\pi e_{3}^{b}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+I don't really understand the equation for gamma.
+ The term 
+\begin_inset Formula $\eta^{b}$
+\end_inset
+
+ doesn't make sense to me.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And solving for 
+\begin_inset Formula $\Theta$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\Theta & =\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}\Pi_{m_{i}}\cos\left(\theta\right)\sin\left(\theta\right)d\theta d\phi\\
+ & =\frac{\pi}{4}\begin{bmatrix}3 & 0 & 0\\
+0 & 3 & 0\\
+0 & 0 & 2
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,3709 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Rotation Matrices
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Rotation matrices has been a bane in my understanding of mechanical systems
+ since they have always confused me.
+ The purpose of this note is to derive the rotation matrix between two frames,
+ distinguish the difference of rotating a vector fixed to the frame and
+ a stationary and moving vector not fixed to the frame, introduce covariant
+ and contravariant rotations of vectors, and passive and active rotation
+ of vectors.
+ 
+\end_layout
+
+\begin_layout Section
+Vector Basics
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Vector"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A vector is a physical object in space that is invariant to changes in coordinat
+es or frames and is often used to express displacement, i.e., a direction
+ and magnitude.
+ I will denote vectors with bold font text, e.g., 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbf{e}$
+\end_inset
+
+.
+ We often wish to represent a vector with respect to (w.r.t.) a frame so that
+ we can measure distances and angles relative to that frame.
+ For example, consider the Euclidean-space 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+, then we can place a reference frame in the space denoted as 
+\begin_inset Formula $\mathcal{F}=\left(O,\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} \right)$
+\end_inset
+
+ where 
+\begin_inset Formula $O$
+\end_inset
+
+ is the origin at the frame and 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} $
+\end_inset
+
+ form a basis of 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+.
+ The basis vectors and a another vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ are shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:non-orthogonalBasis"
+
+\end_inset
+
+.
+ Note that these are physical objects in space and they are not 
+\begin_inset Quotes eld
+\end_inset
+
+tied down
+\begin_inset Quotes erd
+\end_inset
+
+ by any coordinates.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/NonOrthogonalBasis.pdf
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:non-orthogonalBasis"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The frame, 
+\begin_inset Formula $\mathcal{F}$
+\end_inset
+
+, allows me to represent the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ as a linear combination of the basis vectors such that 
+\begin_inset Formula 
+\[
+\mathbf{v}=\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha^{i}$
+\end_inset
+
+ is the component of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ with respect to (w.r.t.) to the basis 
+\begin_inset Formula $\mathbf{e}_{i}$
+\end_inset
+
+.
+ The components indicates how much of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is in the direction of each basis.
+ The vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ can also be represented using matrix notation 
+\begin_inset Formula 
+\[
+\mathbf{v}=\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the first entry is the component of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ w.r.t.
+ to 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ and the second entry is the component of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+From figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:non-orthogonalBasis"
+
+\end_inset
+
+, we can see that 
+\begin_inset Formula $\alpha^{1}=\alpha^{2}=1$
+\end_inset
+
+ so that 
+\begin_inset Formula 
+\[
+\mathbf{v}=\mathbf{e}_{1}+\mathbf{e}_{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+I want to take a moment to stress that I have not associated coordinates
+ to the vectors, i.e., 
+\begin_inset Formula $\mathbf{e}_{2}=2i+4j$
+\end_inset
+
+ where 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $j$
+\end_inset
+
+ are the orthogonal coordinates of 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ each representing a unit meter.
+ I have left the basis vectors as just physical objects somewhere in the
+ plane of 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+, and I have represented the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ using the reference frame 
+\begin_inset Formula $\mathcal{F}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Inner Product
+\end_layout
+
+\begin_layout Standard
+The magnitude of a vector is calculated using the inner product.
+ The standard inner product of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ with itself, denoted 
+\begin_inset Formula $\left\langle \mathbf{v},\mathbf{v}\right\rangle _{\mathbb{R}^{n}}$
+\end_inset
+
+ or simply 
+\begin_inset Formula $\mathbf{v}\cdot\mathbf{v}$
+\end_inset
+
+, is 
+\begin_inset Formula 
+\[
+\left\langle \mathbf{v},\mathbf{v}\right\rangle _{\mathbb{R}^{2}}\coloneqq\sum_{k=1}^{2}\sum_{j=1}^{2}\left(\mathbf{e}_{k}\cdot\mathbf{e}_{j}\right)\alpha^{i}\alpha^{j}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{e}_{i}\cdot\mathbf{e}_{j}$
+\end_inset
+
+ is the inner product between basis.
+ Take note that there are cross terms between the basis since the basis
+ are not always orthogonal.
+\end_layout
+
+\begin_layout Standard
+One can also calculate the inner product of two different vectors.
+ Let 
+\begin_inset Formula $\mathbf{v}_{1}=\beta^{1}\mathbf{e}_{1}+\beta^{2}\mathbf{e}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}_{2}=\gamma^{1}\mathbf{e}_{1}+\gamma^{2}\mathbf{e}_{2}$
+\end_inset
+
+, then the inner product is 
+\begin_inset Formula 
+\[
+\left\langle \mathbf{v}_{1},\mathbf{v}_{2}\right\rangle _{\mathbb{R}^{2}}=\sum_{k=1}^{2}\sum_{j=1}^{2}\left(\mathbf{e}_{k}\cdot\mathbf{e}_{j}\right)\beta^{k}\gamma^{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The inner product can be extended to any finite dimension space, and is
+ not restricted to a space defined by 
+\begin_inset Formula $\mathbb{R}^{n},\,n\in\mathbb{R}^{+}$
+\end_inset
+
+.
+ For an 
+\begin_inset Formula $n$
+\end_inset
+
+ dimensional space, the inner product is defined as 
+\begin_inset Formula 
+\begin{equation}
+\left\langle \mathbf{v}_{1},\mathbf{v}_{2}\right\rangle _{\mathbb{R}^{n}}=\sum_{k=1}^{n}\sum_{j=1}^{n}\left(\mathbf{e}_{k}\cdot\mathbf{e}_{j}\right)\beta^{k}\gamma^{j}\label{eq:innerProduct}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{v}_{1},\mathbf{v}_{2}\in S$
+\end_inset
+
+ , such that 
+\begin_inset Formula $S$
+\end_inset
+
+ is an 
+\begin_inset Formula $n$
+\end_inset
+
+ dimensional Euclidean-Space, and the vectors 
+\begin_inset Formula $\mathbf{v}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}_{2}$
+\end_inset
+
+ have components 
+\begin_inset Formula $\beta^{i}$
+\end_inset
+
+ (respectively 
+\begin_inset Formula $\gamma^{i}$
+\end_inset
+
+) relative to the basis 
+\begin_inset Formula $\mathbf{e}_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The inner product induces a norm on the Euclidean-Space and is denoted as
+ 
+\begin_inset Formula 
+\[
+\left\Vert \mathbf{v}\right\Vert \coloneqq\sqrt{\mathbf{v}\cdot\mathbf{v}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The inner product between two vectors can be simplified if the reference
+ frame has an orthonormal basis.
+ To demonstrate this, let 
+\begin_inset Formula $\mathcal{F}=\left(O,\left\{ \mathbf{e}_{1},\ldots,\mathbf{e}_{n}\right\} \right)$
+\end_inset
+
+ be a reference frame in 
+\begin_inset Formula $\mathbb{R}^{n}$
+\end_inset
+
+ with an orthonormal basis, then 
+\begin_inset Formula 
+\[
+\left\langle \mathbf{e}_{i},\mathbf{e}_{j}\right\rangle =\begin{cases}
+1 & \text{if }i=j\\
+0 & \text{else}
+\end{cases},\,i,j\in\left\{ 1,\ldots,n\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using this relation, the inner product can be simplified to 
+\begin_inset Formula 
+\begin{align}
+\left\langle \mathbf{v}_{1},\mathbf{v}_{2}\right\rangle _{\mathbb{R}^{n}} & =\sum_{k=1}^{n}\left(\mathbf{e}_{k}\cdot\mathbf{e}_{k}\right)\beta^{k}\gamma^{k}\nonumber \\
+ & =\sum_{k=1}^{n}\beta^{k}\gamma^{k}\label{eq:simplifiedInnerProduct}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Angle Between Vectors
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Angle-Between-Vectors"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There is a geometric relationship between the inner product between two
+ vectors and the angle between them.
+ This is 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}_{i}\cdot\mathbf{v}_{j}=\left\Vert \mathbf{v}_{i}\right\Vert \left\Vert \mathbf{v}_{j}\right\Vert =\cos\theta\label{eq:innerProductAngle}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\left\Vert \mathbf{v}\right\Vert =\sqrt{\mathbf{v}\cdot\mathbf{v}}$
+\end_inset
+
+ is the induced norm.
+ Thus one can calculate the angle between 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and the basis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ to be 
+\begin_inset Formula 
+\[
+\theta=\arccos\left(\frac{\left\langle \mathbf{v},\mathbf{e}_{1}\right\rangle }{\left\Vert \mathbf{v}\right\Vert \left\Vert \mathbf{e}_{1}\right\Vert }\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The relationship between the inner product and the angle of two vectors
+ can be simplified, if the vectors are unit length, to 
+\begin_inset Formula 
+\begin{equation}
+\left\langle \mathbf{v}_{1},\mathbf{v}_{2}\right\rangle =\cos\theta\label{eq:angleRelationship}
+\end{equation}
+
+\end_inset
+
+since 
+\begin_inset Formula $\left\Vert \mathbf{v}_{1}\right\Vert =\left\Vert \mathbf{v}_{2}\right\Vert =1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Transformation Between Reference Frames in 2 Dimensions
+\end_layout
+
+\begin_layout Standard
+It is often convenient to be able to represent a vector in one reference
+ frame and then represent it in a different reference frame.
+ In order to do this we need to construct the 
+\series bold
+Forward
+\series default
+ and 
+\series bold
+Backward 
+\series default
+transformation between two reference frame.
+ To begin we consider the simplified case working in 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ as depicted in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:basisTransformNonStandard"
+
+\end_inset
+
+.
+ The figure shows two frames, 
+\begin_inset Formula $\mathcal{F}^{1}=\left(O_{1},\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} \right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}=\left(O_{2},\left\{ \mathbf{\tilde{e}}_{1},\mathbf{\tilde{e}}_{2}\right\} \right)$
+\end_inset
+
+, in 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ with nonorthogonal basis and coincident origins, i.e., 
+\begin_inset Formula $\mathbf{e}_{1}\cdot\mathbf{e}_{2}\neq0$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{\tilde{e}}_{1}\cdot\tilde{\mathbf{e}}_{2}\neq0$
+\end_inset
+
+ and 
+\begin_inset Formula $O_{1}=O_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figures/TransformBasisNonStandard.pdf
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:basisTransformNonStandard"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The forward and backward transformations expresses the bases of one frame
+ in the other frame.
+ We will define the forward transformation as the transformation that expresses
+ the basis of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+, and the backward transformation as the transformation that expresses the
+ bases of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ in terms of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Forward Transformation
+\end_layout
+
+\begin_layout Standard
+For the forward transformation we want to find the components of 
+\begin_inset Formula $\tilde{\mathbf{e}}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\mathbf{e}}_{2}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}\\
+\mathbf{\tilde{e}}_{2} & =\beta^{1}\mathbf{e}_{1}+\beta^{2}\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+The components can be found by inspection of figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:basisTransformNonStandard"
+
+\end_inset
+
+ to be 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\frac{2}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & -\frac{1}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+however, I want to show you how the inner product can be used to find the
+ components since this will be useful later on.
+ Taking the inner product of 
+\begin_inset Formula $\tilde{\mathbf{e}}_{1}$
+\end_inset
+
+ with each basis of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ we get the system of equations 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1}\cdot\mathbf{e}_{1} & =\alpha^{1}\mathbf{e}_{1}\cdot\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}\cdot\mathbf{e}_{1}\\
+\mathbf{\tilde{e}}_{1}\cdot\mathbf{e}_{2} & =\alpha^{1}\mathbf{e}_{1}\cdot\mathbf{e}_{2}+\alpha^{2}\mathbf{e}_{2}\cdot\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix notation 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\mathbf{\tilde{e}}_{1}\cdot\mathbf{e}_{1}\\
+\mathbf{\tilde{e}}_{1}\cdot\mathbf{e}_{2}
+\end{bmatrix}=\begin{bmatrix}\mathbf{e}_{1}\cdot\mathbf{e}_{1} & \mathbf{e}_{1}\cdot\mathbf{e}_{2}\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{1} & \mathbf{e}_{2}\cdot\mathbf{e}_{2}
+\end{bmatrix}\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}
+\end{bmatrix}\label{eq:e1tilde_components}
+\end{equation}
+
+\end_inset
+
+where the components 
+\begin_inset Formula $\alpha^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha^{2}$
+\end_inset
+
+ are the unknowns and the inner products can be measured.
+ To simplify this problem, I will introduce the reference frame 
+\begin_inset Formula $\mathcal{F}^{3}=\left(O_{3},\left\{ \mathbf{i},\mathbf{j}\right\} \right)$
+\end_inset
+
+ that has orthonormal bases as depicted in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:transformBasisNonStandardCoordinates"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/TransformBasisNonStandardCoordinates.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:transformBasisNonStandardCoordinates"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using this new reference frame I can express each basis in 
+\begin_inset Formula $\mathcal{F}^{3}$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =4\mathbf{i}+0\mathbf{j}\\
+\mathbf{e}_{2} & =1\mathbf{i}+3\mathbf{j}\\
+\tilde{\mathbf{e}}_{1} & =3\mathbf{i}+1\mathbf{j}\\
+\tilde{\mathbf{e}}_{2} & =-1\mathbf{i}+1\mathbf{j}
+\end{align*}
+
+\end_inset
+
+and easily take their inner products.
+ The first inner product is given in detail as
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1}\cdot\mathbf{e}_{1} & =4*4\left(\mathbf{i}\cdot\mathbf{i}\right)+4*0\left(\mathbf{i}\cdot\mathbf{j}\right)+0*4\left(\mathbf{j}\cdot\mathbf{i}\right)+0*0\left(\mathbf{j}\cdot\mathbf{j}\right)\\
+ & =4*4\left(1\right)+4*0\left(0\right)+0*4\left(0\right)+0*0\left(1\right)\\
+ & =16
+\end{align*}
+
+\end_inset
+
+I will not write out the inner products in detail, but all of them are given
+ below.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1}\cdot\mathbf{e}_{1} & =16\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{1} & =4\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{2} & =10
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\tilde{\mathbf{e}}_{1}\cdot\tilde{\mathbf{e}}_{1} & =10\\
+\mathbf{\tilde{e}}_{2}\cdot\mathbf{\tilde{e}}_{1} & =-2\\
+\mathbf{\tilde{e}}_{2}\cdot\mathbf{\tilde{e}}_{2} & =2
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{1} & =12\\
+\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{2} & =-4\\
+\mathbf{e}_{2}\cdot\mathbf{\tilde{e}}_{1} & =6\\
+\mathbf{e}_{2}\cdot\mathbf{\tilde{e}}_{2} & =2
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "tb:innerProducts"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that we omitted many of the inner products due to the symmetric property,
+ i.e., 
+\begin_inset Formula $\mathbf{v}_{1}\cdot\mathbf{v}_{2}=\mathbf{v}_{2}\cdot\mathbf{v}_{1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Substituting the inner products into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:e1tilde_components"
+
+\end_inset
+
+ yields
+\begin_inset Formula 
+\[
+\begin{bmatrix}12\\
+6
+\end{bmatrix}=\begin{bmatrix}16 & 4\\
+4 & 10
+\end{bmatrix}\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and solving for the components gives 
+\begin_inset Formula $\alpha^{1}=\frac{2}{3}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha^{2}=\frac{1}{3}$
+\end_inset
+
+ which we did by inspection above.
+\end_layout
+
+\begin_layout Standard
+The same process is done to express the basis 
+\begin_inset Formula $\tilde{\mathbf{e}}_{2}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+.
+ We begin with the desired component representation
+\begin_inset Formula 
+\[
+\mathbf{\tilde{e}}_{2}=\beta^{1}\mathbf{e}_{1}+\beta^{2}\mathbf{e}_{2}
+\]
+
+\end_inset
+
+then taking the inner product of 
+\begin_inset Formula $\tilde{\mathbf{e}}_{2}$
+\end_inset
+
+ with each basis of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ we get the system of equations 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{2}\cdot\mathbf{e}_{1} & =\beta^{1}\mathbf{e}_{1}\cdot\mathbf{e}_{1}+\beta^{2}\mathbf{e}_{2}\cdot\mathbf{e}_{1}\\
+\mathbf{\tilde{e}}_{2}\cdot\mathbf{e}_{2} & =\beta^{1}\mathbf{e}_{1}\cdot\mathbf{e}_{2}+\beta^{2}\mathbf{e}_{2}\cdot\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix notation 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\mathbf{\tilde{e}}_{2}\cdot\mathbf{e}_{1}\\
+\mathbf{\tilde{e}}_{2}\cdot\mathbf{e}_{2}
+\end{bmatrix}=\begin{bmatrix}\mathbf{e}_{1}\cdot\mathbf{e}_{1} & \mathbf{e}_{1}\cdot\mathbf{e}_{2}\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{1} & \mathbf{e}_{2}\cdot\mathbf{e}_{2}
+\end{bmatrix}\begin{bmatrix}\beta^{1}\\
+\beta^{2}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+Substituting in the numerical values for the inner products yields
+\begin_inset Formula 
+\[
+\begin{bmatrix}-4\\
+2
+\end{bmatrix}=\begin{bmatrix}16 & 4\\
+4 & 10
+\end{bmatrix}\begin{bmatrix}\beta^{1}\\
+\beta^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+and solving for the components gives 
+\begin_inset Formula $\beta^{1}=-\frac{1}{3}$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta^{2}=\frac{1}{3}$
+\end_inset
+
+ which we did by inspection above.
+\end_layout
+
+\begin_layout Standard
+Now that we have the components of the forward transformation, we can represent
+ them using matrix notation
+\begin_inset Formula 
+\begin{align*}
+F & =\begin{bmatrix}\alpha^{1} & \beta^{1}\\
+\alpha^{2} & \beta^{2}
+\end{bmatrix}\\
+ & =\begin{bmatrix}\frac{2}{3} & -\frac{1}{3}\\
+\frac{1}{3} & \frac{1}{3}
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Backward Transformation
+\end_layout
+
+\begin_layout Standard
+The backward transformation is the inverse of the forward transformation.
+ Using the same process, we can express the bases of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =\gamma^{1}\mathbf{\tilde{e}}_{1}+\gamma^{2}\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =\chi^{1}\mathbf{\tilde{e}}_{1}+\chi^{2}\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma^{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\chi^{i},\,i\in\left\{ 1,2\right\} $
+\end_inset
+
+ are the components.
+ Taking the inner product of 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ with the bases of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ generates the system of equations
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{1} & =\gamma^{1}\mathbf{\tilde{e}}_{1}\cdot\mathbf{\tilde{e}}_{1}+\gamma^{2}\mathbf{\tilde{e}}_{2}\cdot\tilde{\mathbf{e}}_{1}\\
+\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{2} & =\gamma^{1}\mathbf{\tilde{e}}_{1}\cdot\mathbf{\tilde{e}}_{2}+\gamma^{2}\mathbf{\tilde{e}}_{2}\cdot\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix notation
+\begin_inset Formula 
+\[
+\begin{bmatrix}\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{1}\\
+\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{2}
+\end{bmatrix}=\begin{bmatrix}\mathbf{\tilde{e}}_{1}\cdot\mathbf{\tilde{e}}_{1} & \mathbf{\tilde{e}}_{2}\cdot\tilde{\mathbf{e}}_{1}\\
+\mathbf{\tilde{e}}_{1}\cdot\mathbf{\tilde{e}}_{2} & \mathbf{\tilde{e}}_{2}\cdot\mathbf{\tilde{e}}_{2}
+\end{bmatrix}\begin{bmatrix}\gamma^{1}\\
+\gamma^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+substituting in the numerical values for each inner product yields
+\begin_inset Formula 
+\[
+\begin{bmatrix}12\\
+-4
+\end{bmatrix}=\begin{bmatrix}10 & -2\\
+-2 & 2
+\end{bmatrix}\begin{bmatrix}\gamma^{1}\\
+\gamma^{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and solving for the components gives 
+\begin_inset Formula $\gamma^{1}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{2}=-1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the same process to solve for 
+\begin_inset Formula $\chi^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+ yields 
+\begin_inset Formula $\chi^{1}=-1$
+\end_inset
+
+ and 
+\begin_inset Formula $\chi^{2}=2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Now that we have the components of the backward transformation, we can write
+ it as
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =1\mathbf{\tilde{e}}_{1}-1\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =1\mathbf{\tilde{e}}_{1}+2\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix notation 
+\begin_inset Formula 
+\begin{align*}
+B & =\begin{bmatrix}\gamma^{1} & \chi^{1}\\
+\gamma^{2} & \chi^{2}
+\end{bmatrix}\\
+ & =\begin{bmatrix}1 & 1\\
+-1 & 2
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can verify the forward and backward transformations using the fact that
+ they are inverses of each other.
+ This indicates that 
+\begin_inset Formula 
+\[
+FB=I
+\]
+
+\end_inset
+
+which should makes sense since the backward process should be the inverse
+ of the forward process.
+ Let's verify that the forward and backward transformations that we calculated
+ are indeed inverses
+\begin_inset Formula 
+\begin{align*}
+FB & =I\\
+\begin{bmatrix}\frac{2}{3} & -\frac{1}{3}\\
+\frac{1}{3} & \frac{1}{3}
+\end{bmatrix}\begin{bmatrix}1 & 1\\
+-1 & 2
+\end{bmatrix} & =I\\
+I & =I
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Change of Bases for a Vector
+\end_layout
+
+\begin_layout Standard
+Now that we know how to compute the forward and backward transformations
+ between bases of different reference frames using the inner product, let's
+ look at how to transform a vector expressed in one frame to being expressed
+ in another.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/VectorStransformNonStandard.pdf
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:vectorTransformNonStandard"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider the figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:vectorTransformNonStandard"
+
+\end_inset
+
+ with two frames, 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ whose origin is coincident, but whose basis are not orthogonal.
+ We have already calculated the forward and backward transformation, so
+ I will not repeat those steps here, but they will be given again.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "eq:forwardNonOthogonal"
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align}
+\mathbf{\tilde{e}}_{1} & =\frac{2}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & =-\frac{1}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}
+\end{align}
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "eq:backwardNonOrthogonal"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\mathbf{e}_{1} & =1\mathbf{\tilde{e}}_{1}-1\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =1\mathbf{\tilde{e}}_{1}+2\mathbf{\tilde{e}}_{2}
+\end{align}
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{subequations}
+\end_layout
+
+\end_inset
+
+The forward and backward transformations in matrix notation are 
+\begin_inset Formula 
+\begin{align*}
+F & =\begin{bmatrix}\frac{2}{3} & -\frac{1}{3}\\
+\frac{1}{3} & \frac{1}{3}
+\end{bmatrix}\\
+B & =\begin{bmatrix}1 & 1\\
+-1 & 2
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+and it can be easily verified that 
+\begin_inset Formula $FB=I$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ can be represented in both coordinate frames as
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v}^{1} & =1\mathbf{e}_{1}+1\mathbf{\mathbf{e}}_{2}\\
+\mathbf{v}^{2} & =2\mathbf{\tilde{e}}_{1}+1\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+where the superscript denotes which frame it is being expressed in.
+ You can use the same process outlined in the previous subsections to compute
+ the components using the inner product, but we will skip that process and
+ grab the components using visual inspection.
+\end_layout
+
+\begin_layout Standard
+To transform the components of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to be expressed in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ we start with 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ expressed in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and substitute in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:backwardNonOrthogonal"
+
+\end_inset
+
+ to represent each basis of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v} & =1\mathbf{e}_{1}+1\mathbf{\mathbf{e}}_{2}\\
+ & =1\left(1\mathbf{\tilde{e}}_{1}-1\mathbf{\tilde{e}}_{2}\right)+1\left(1\mathbf{\tilde{e}}_{1}+2\mathbf{\tilde{e}}_{2}\right)\\
+ & =\left(1+1\right)\mathbf{\tilde{e}}_{1}+\left(-1+2\right)\mathbf{\tilde{e}}_{2}\\
+ & =2\mathbf{\tilde{e}}_{1}+1\mathbf{\tilde{e}}_{2}\\
+ & =\mathbf{v}^{2}
+\end{align*}
+
+\end_inset
+
+which can be done using matrix notation
+\begin_inset Formula 
+\[
+\mathbf{v}^{2}=\begin{bmatrix}1 & 1\\
+-1 & 2
+\end{bmatrix}\begin{bmatrix}1\\
+1
+\end{bmatrix}
+\]
+
+\end_inset
+
+note that in order to transform the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ from being expressed in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to being expressed in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ we used the backward transformation.
+ This implies that we can reverse the transformation using the forward transform
+ation.
+ To show this we begin with representing the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ and transform to 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:forwardNonOthogonal"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v} & =2\mathbf{\tilde{e}}_{1}+1\mathbf{\tilde{e}}_{2}\\
+ & =2\left(\frac{2}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}\right)+1\left(-\frac{1}{3}\mathbf{e}_{1}+\frac{1}{3}\mathbf{\mathbf{e}}_{2}\right)\\
+ & =\left(2*\frac{2}{3}-\frac{1}{3}\right)\mathbf{e}_{1}+\left(2*\frac{1}{3}+\frac{1}{3}\right)\mathbf{e}_{2}\\
+ & =1\mathbf{e}_{1}+1\mathbf{e}_{2}\\
+ & =\mathbf{v}^{1}
+\end{align*}
+
+\end_inset
+
+which can be done using matrix notation
+\begin_inset Formula 
+\[
+\mathbf{v}^{1}=\begin{bmatrix}\frac{2}{3} & -\frac{1}{3}\\
+\frac{1}{3} & \frac{1}{3}
+\end{bmatrix}\begin{bmatrix}2\\
+1
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Just to be clear, to transform the bases of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ we use the forward transformation, but to change the components of a vector
+ expressed in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ we use the backward transformation.
+ Likewise to transform the bases of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ we use the backward transformation, but to change the components of a vector
+ express in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ we use the forward transformation.
+ This means that vector components are contravariant to bases, i.e., they
+ transform in the inverse manner.
+ To build intuition of why this is, consider the simple example of measuring
+ a person's height as depicted in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:person"
+
+\end_inset
+
+.
+ We have two different basis, 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{\tilde{e}}_{1}$
+\end_inset
+
+ that share the same origin; in the figure we have separated them for visual
+ simplicity.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/PersonMeasure.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:person"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can easily create the transformation between the two basis as 
+\begin_inset Formula 
+\begin{align*}
+\tilde{\mathbf{e}}_{1} & =3\mathbf{e}_{1}\\
+\mathbf{e}_{1} & =\frac{1}{3}\tilde{\mathbf{e}}_{1}
+\end{align*}
+
+\end_inset
+
+We can also easily represent the person's height relative to the two basis
+\begin_inset Formula 
+\begin{align*}
+\mathbf{h}^{1} & =6\mathbf{e}_{1}\\
+\mathbf{h}^{2} & =2\tilde{\mathbf{e}}_{1}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{h}$
+\end_inset
+
+ is the vector representing the person's height.
+ Note that the person's height doesn't change as we change frames, only
+ the components change that represent the height relative to each basis.
+ To illustrate this better, suppose 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ represents 1 foot and 
+\begin_inset Formula $\tilde{\mathbf{e}}_{1}$
+\end_inset
+
+ represents 1 yard, then the person is 6 feet or 2 yards tall.
+ As I convert between feet to yards, the component gets smaller, but my
+ unit of measure gets bigger.
+ Hopefully this explains why vector components are contravariant.
+ 
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Note Note
+status open
+
+\begin_layout Subsection
+Moving Vector in a Fixed Basis
+\end_layout
+
+\begin_layout Plain Layout
+In the case that we have a fixed frame 
+\begin_inset Formula $\mathcal{F}^{1}=\left(O_{1},\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} \right)$
+\end_inset
+
+, and a vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ rotating about the origin of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+, we want to know how the components of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ need to change.
+ This problem is represented in figure 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "fig:movingVectorNonorthonormal"
+
+\end_inset
+
+ where the vector's initial and final position are denoted 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}'$
+\end_inset
+
+.
+ The angle 
+\begin_inset Formula $\theta_{1}$
+\end_inset
+
+ is the angle between 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ and the angle 
+\begin_inset Formula $\theta_{2}$
+\end_inset
+
+ is the angle between 
+\begin_inset Formula $\mathbf{v}'$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/ActiveTransformNonorthogonal.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:movingVectorNonorthonormal"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+We can express each vector in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v} & =\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}\\
+\mathbf{v}' & =\beta^{1}\mathbf{e}_{1}+\beta^{2}\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+and we want to find the transformation from the components 
+\begin_inset Formula $\alpha^{i}$
+\end_inset
+
+ to the components 
+\begin_inset Formula $\beta^{i},\,i\in\left\{ 1,2\right\} $
+\end_inset
+
+.
+ We assume that we already know 
+\begin_inset Formula $\alpha^{1}$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha^{2}$
+\end_inset
+
+, and we can calculate the inner products between the basis.
+ Using information already gathered from the previous subsections we have
+ 
+\begin_inset Formula $\mathbf{v}=1\mathbf{e}_{1}+1\mathbf{\mathbf{e}}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1}\cdot\mathbf{e}_{1} & =16\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{1} & =4\\
+\mathbf{e}_{2}\cdot\mathbf{e}_{2} & =10
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+We can also calculate the inner product of the vector 
+\begin_inset Formula 
+\[
+\mathbf{v}\cdot\mathbf{v}=\mathbf{v}'\cdot\mathbf{v}'=34
+\]
+
+\end_inset
+
+since we know the components 
+\begin_inset Formula $\alpha^{i},\,i\in\left\{ 1,2\right\} $
+\end_inset
+
+ and that 
+\begin_inset Formula $\left\Vert \mathbf{v}\right\Vert =\left\Vert \mathbf{v}'\right\Vert $
+\end_inset
+
+ since they are the same vector.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Orthonormal Bases
+\end_layout
+
+\begin_layout Standard
+Up to this point we have worked with frames that have nonorthonormal bases
+ which can be difficult to work with.
+ Using orthonormal bases greatly simplifies finding the components of a
+ vector relative to each basis.
+ For example if I had a vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ , and I wanted to express it in 
+\begin_inset Formula $\mathcal{F}=\left(O,\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} \right)$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{align}
+\mathbf{v} & =\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}\label{eq:vectorComponentOrthonormal}
+\end{align}
+
+\end_inset
+
+i could find the components by taking the inner product of the equation
+ with each basis to form the system of equations
+\begin_inset Formula 
+\begin{align*}
+\left(\mathbf{v}\cdot\mathbf{e}_{1}\right) & =\alpha^{1}\left(\mathbf{e}_{1}\cdot\mathbf{e}_{1}\right)+\alpha^{2}\left(\mathbf{e}_{2}\cdot\mathbf{e}_{1}\right)\\
+\left(\mathbf{v}\cdot\mathbf{e}_{2}\right) & =\alpha^{1}\left(\mathbf{e}_{1}\cdot\mathbf{e}_{2}\right)+\alpha^{2}\left(\mathbf{e}_{2}\cdot\mathbf{e}_{2}\right)
+\end{align*}
+
+\end_inset
+
+which can be simplified noting that 
+\begin_inset Formula $\left(\mathbf{e}_{2}\cdot\mathbf{e}_{1}\right)=0$
+\end_inset
+
+ since the bases are orthogonal.
+ Using this simplification we get 
+\begin_inset Formula 
+\begin{align*}
+\left(\mathbf{v}\cdot\mathbf{e}_{1}\right) & =\alpha^{1}\left(\mathbf{e}_{1}\cdot\mathbf{e}_{1}\right)\\
+\left(\mathbf{v}\cdot\mathbf{e}_{2}\right) & =\alpha^{2}\left(\mathbf{e}_{2}\cdot\mathbf{e}_{2}\right)
+\end{align*}
+
+\end_inset
+
+which can be simplified even more noting that 
+\begin_inset Formula $\left(\mathbf{e}_{1}\cdot\mathbf{e}_{1}\right)=\left(\mathbf{e}_{2}\cdot\mathbf{e}_{2}\right)=1$
+\end_inset
+
+ since the bases are unit length.
+ Using this simplification we get 
+\begin_inset Formula 
+\begin{align*}
+\left(\mathbf{v}\cdot\mathbf{e}_{1}\right) & =\alpha^{1}\\
+\left(\mathbf{v}\cdot\mathbf{e}_{2}\right) & =\alpha^{2}
+\end{align*}
+
+\end_inset
+
+which allows us to rewrite 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:vectorComponentOrthonormal"
+
+\end_inset
+
+ as 
+\begin_inset Formula 
+\[
+\mathbf{v}=\left(\mathbf{v}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}
+\]
+
+\end_inset
+
+which can also be expressed in terms of angles as 
+\begin_inset Formula 
+\[
+\mathbf{v}=\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{1}\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{2}\right)\mathbf{e}_{2}
+\]
+
+\end_inset
+
+using the inner product to angle identity discussed in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Angle-Between-Vectors"
+
+\end_inset
+
+.
+ We can simplify the expression even more by taking the inner product of
+ 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ with itself
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v}\cdot\mathbf{v} & =\mathbf{v}\cdot\left(\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{1}\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{2}\right)\mathbf{e}_{2}\right)\\
+ & =\left\Vert \mathbf{v}\right\Vert \left(\cos\left(\theta_{1}\right)\left(\mathbf{v}\cdot\mathbf{e}_{1}\right)+\cos\left(\theta_{2}\right)\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)\right)\\
+ & =\left\Vert \mathbf{v}\right\Vert \left(\cos\left(\theta_{1}\right)\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{1}\right)+\cos\left(\theta_{2}\right)\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{2}\right)\right)\\
+ & =\left\Vert \mathbf{v}\right\Vert ^{2}\left(\cos^{2}\left(\theta_{1}\right)+\cos^{2}\left(\theta_{2}\right)\right)
+\end{align*}
+
+\end_inset
+
+which forces the constraint 
+\begin_inset Formula 
+\[
+\cos^{2}\left(\theta_{1}\right)+\cos^{2}\left(\theta_{2}\right)=1
+\]
+
+\end_inset
+
+which implies 
+\begin_inset Formula 
+\[
+\cos\left(\theta_{2}\right)=\pm\sin\left(\theta_{1}\right)
+\]
+
+\end_inset
+
+where the sign can be determined by the sign of the inner product.
+ 
+\end_layout
+
+\begin_layout Standard
+In summary, a vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ can be expressed in a frame with an orthonormal basis as 
+\begin_inset Formula 
+\[
+\mathbf{v}=\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{align*}
+\alpha^{1} & =\left(\mathbf{v}\cdot\mathbf{e}_{1}\right)=\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{1}\right)\\
+\alpha^{2} & =\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)=\text{sign}\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)\sin\left(\theta_{1}\right)
+\end{align*}
+
+\end_inset
+
+and if 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is unit length, the equations simplify to 
+\begin_inset Formula 
+\begin{align*}
+\alpha^{1} & =\left(\mathbf{v}\cdot\mathbf{e}_{1}\right)=\cos\left(\theta_{1}\right)\\
+\alpha^{2} & =\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)=\text{sign}\left(\mathbf{v}\cdot\mathbf{e}_{2}\right)\sin\left(\theta_{1}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is in a higher dimensional space, with dimension 
+\begin_inset Formula $n$
+\end_inset
+
+, being expressed in a frame with an orthonormal basis we still have the
+ identities
+\begin_inset Formula 
+\[
+\alpha^{i}=\left(\mathbf{v}\cdot\mathbf{e}_{i}\right)=\left\Vert \mathbf{v}\right\Vert \cos\left(\theta_{i}\right),\,i=\left\{ 1,\ldots,n\right\} 
+\]
+
+\end_inset
+
+and the constraint 
+\begin_inset Formula 
+\[
+\sum\left(\alpha^{i}\right)^{2}=\left\Vert \mathbf{v}\right\Vert ,,\,i=\left\{ 1,\ldots,n\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Rotation Matrices SO
+\begin_inset Formula $\left(2\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/RotationMatrices.pdf
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:FrameTransform2D"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Forward Transformation
+\end_layout
+
+\begin_layout Standard
+The transformation between frames relates each basis in one frame to each
+ basis in another frame.
+ We will start by relating the basis of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ in terms of the basis of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ using the inner product.
+ 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\left(\mathbf{\tilde{e}}_{1}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\mathbf{\tilde{e}}_{1}\cdot\mathbf{\mathbf{e}}_{2}\right)\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & =\left(\mathbf{\tilde{e}}_{2}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\mathbf{\tilde{e}}_{2}\cdot\mathbf{\mathbf{e}}_{2}\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\left(\mathbf{\tilde{e}}_{a}\cdot\mathbf{e}_{b}\right)\mathbf{e}_{b},\,a,b\in\left\{ 1,2\right\} $
+\end_inset
+
+ represents 
+\begin_inset Quotes eld
+\end_inset
+
+how much
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{\tilde{e}}_{a}$
+\end_inset
+
+ is in the direction of 
+\begin_inset Formula $\mathbf{e}_{b}$
+\end_inset
+
+ measured in terms of 
+\begin_inset Formula $\mathbf{e}_{b}$
+\end_inset
+
+.
+ From section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Vector"
+
+\end_inset
+
+, we saw that the inner product can be represented in terms of angles.
+ This allows us to write the previous equations as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\left\Vert \mathbf{\tilde{e}}_{1}\right\Vert \left\Vert \mathbf{e}_{1}\right\Vert \cos\left(\phi_{1,1}\right)\mathbf{e}_{1}+\left\Vert \mathbf{\tilde{e}}_{1}\right\Vert \left\Vert \mathbf{e}_{2}\right\Vert \cos\left(\phi_{1,2}\right)\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & =\left\Vert \mathbf{\tilde{e}}_{2}\right\Vert \left\Vert \mathbf{e}_{1}\right\Vert \cos\left(\phi_{2,1}\right)\mathbf{e}_{1}+\left\Vert \mathbf{\tilde{e}}_{2}\right\Vert \left\Vert \mathbf{e}_{2}\right\Vert \cos\left(\phi_{2,2}\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\phi_{a,b},\,a,b\in\left\{ 1,2\right\} $
+\end_inset
+
+ denotes the angle between vectors 
+\begin_inset Formula $\mathbf{\tilde{e}}_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{b}$
+\end_inset
+
+.
+ Since the bases are orthonormal, we can simplify the equations to
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\cos\left(\theta\right)\mathbf{e}_{1}+\cos\left(\frac{\pi}{2}-\theta\right)\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & =\cos\left(\frac{\pi}{2}+\theta\right)\mathbf{e}_{1}+\cos\left(\theta\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the angle between 
+\begin_inset Formula $\mathbf{\tilde{e}}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ measured counterclockwise.
+ Using the identities
+\begin_inset Formula $\cos\left(\frac{\pi}{2}+\theta\right)=-\sin\left(\theta\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\cos\left(\frac{\pi}{2}-\theta\right)=\sin\left(\theta\right)$
+\end_inset
+
+, we simplify the equations even further
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "eq:etilde_e"
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align}
+\mathbf{\tilde{e}}_{1} & =\cos\left(\theta\right)\mathbf{e}_{1}+\sin\left(\theta\right)\mathbf{\mathbf{e}}_{2}\\
+\mathbf{\tilde{e}}_{2} & =-\sin\left(\theta\right)\mathbf{e}_{1}+\cos\left(\theta\right)\mathbf{\mathbf{e}}_{2}
+\end{align}
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{subequations}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which gives us the forward transformation.
+ We can represent each basis vector using matrix notation as 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{\tilde{e}}_{1} & =\begin{bmatrix}\cos\left(\theta\right)\\
+\sin\left(\theta\right)
+\end{bmatrix}\\
+\mathbf{\tilde{e}}_{2} & =\begin{bmatrix}-\sin\left(\theta\right)\\
+\cos\left(\theta\right)
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+We can also represent it in another matrix 
+\begin_inset Formula 
+\[
+F_{2}^{1}=\begin{bmatrix}\cos\left(\theta\right) & -\sin\left(\theta\right)\\
+\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+where the first column is the matrix notation of 
+\begin_inset Formula $\mathbf{\tilde{e}}_{1}$
+\end_inset
+
+ and the second column is the matrix notation of 
+\begin_inset Formula $\mathbf{\tilde{e}}_{2}$
+\end_inset
+
+.
+ The superscript and subscript indicates that it transforms the basis vectors
+ from 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+ This notation might seem strange since one might be tempted to write 
+\begin_inset Formula 
+\[
+\begin{bmatrix}\mathbf{\tilde{e}}_{1}\\
+\mathbf{\tilde{e}}_{2}
+\end{bmatrix}=\begin{bmatrix}\cos\left(\theta\right) & \sin\left(\theta\right)\\
+-\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\begin{bmatrix}\mathbf{e}_{1}\\
+\mathbf{\mathbf{e}}_{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+but this notation doesn't make sense since matrix notation stores the components
+ of vectors relative to a basis and not the actual vectors.
+ If we get down to the fundamentals, a matrix is just a container and we
+ can organize the information inside a matrix however we want.
+ Typically the way information is stored in a matrix is for convenience.
+ I don't want to get into much detain about this, but the way we constructed
+ the matrix 
+\begin_inset Formula $F_{2}^{1}$
+\end_inset
+
+ will make sense later.
+ 
+\end_layout
+
+\begin_layout Subsection
+Backward Transformation
+\end_layout
+
+\begin_layout Standard
+Lets say that we want to relate the basis of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ in terms of the basis of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+ To do this, we follow the same procedure as done in the previous step;
+ however , we will skip a few steps here.
+ We begin by relating each basis in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to each basis in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ using the inner product.
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =\left(\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{1}\right)\mathbf{\tilde{e}}_{1}+\left(\mathbf{e}_{1}\cdot\mathbf{\tilde{e}}_{2}\right)\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =\left(\mathbf{\mathbf{e}}_{2}\cdot\mathbf{\tilde{e}}_{1}\right)\mathbf{\tilde{e}}_{1}+\left(\mathbf{\mathbf{e}}_{2}\cdot\mathbf{\tilde{e}}_{2}\right)\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented using angles
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =\cos\left(\theta\right)\mathbf{\tilde{e}}_{1}+\cos\left(\frac{\pi}{2}+\theta\right)\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =\cos\left(\frac{\pi}{2}-\theta\right)\mathbf{\tilde{e}}_{1}+\cos\left(\theta\right)\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+and simplified to 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{e}_{1} & =\cos\left(\theta\right)\mathbf{\tilde{e}}_{1}+-\sin\left(\theta\right)\mathbf{\tilde{e}}_{2}\\
+\mathbf{e}_{2} & =\sin\left(\theta\right)\mathbf{\tilde{e}}_{1}+\cos\left(\theta\right)\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which gives us the backward transformation.
+ This transformation is a (1,1)-Tensor and can be represented in matrix
+ form as 
+\begin_inset Formula 
+\[
+B_{1}^{2}=\begin{bmatrix}\cos\left(\theta\right) & \sin\left(\theta\right)\\
+-\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To verify these transformations, it would make sense that one transformation
+ should be the inverse of the other.
+ It is easily verified that 
+\begin_inset Formula 
+\[
+B_{1}^{2}F_{2}^{1}=F_{2}^{1^{-1}}F_{2}^{1}=F_{2}^{1^{\top}}F_{2}^{1}=I
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Transformation Between Three reference frames
+\end_layout
+
+\begin_layout Standard
+We next explore the transformation between three reference frames which
+ will help us derive the derivative of the transfer function between frames.
+ We introduce the third frame 
+\begin_inset Formula $\mathcal{F}^{3}=\left(O_{3},\left\{ \bar{\mathbf{e}}_{1},\mathbf{\bar{e}}_{2}\right\} \right)$
+\end_inset
+
+ whose origin 
+\begin_inset Formula $O_{3}$
+\end_inset
+
+ is coincident with 
+\begin_inset Formula $O_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $O_{1}$
+\end_inset
+
+.
+ We also know the angle between the basis vectors 
+\begin_inset Formula $\bar{\mathbf{e}}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{\tilde{e}}_{1}$
+\end_inset
+
+.
+ The relationship between the three frames is shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:3frames_2d"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/RotationMatrices2_3f.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:3frames_2d"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We have already shown the relationship between 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+ We wish to derive the transformation from 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{3}$
+\end_inset
+
+.
+ To do this, we begin by finding the relationship between 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{3}$
+\end_inset
+
+, and then use this relationship with the relationship between 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ to find the transformation from 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{3}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Using the procedure from above, we can express the basis of 
+\begin_inset Formula $\mathcal{F}^{3}$
+\end_inset
+
+ in terms of the basis of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\bar{\mathbf{e}}_{1} & =\cos\left(\phi\right)\mathbf{\tilde{e}}_{1}+\sin\left(\phi\right)\mathbf{\tilde{e}}_{2}\\
+\bar{\mathbf{e}}_{2} & =-\sin\left(\phi\right)\mathbf{\tilde{e}}_{1}+\cos\left(\phi\right)\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix form as 
+\begin_inset Formula 
+\[
+F_{3}^{2}=\begin{bmatrix}\cos\left(\phi\right) & -\sin\left(\phi\right)\\
+\sin\left(\phi\right) & \cos\left(\phi\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since we know how to express the basis vectors of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ in terms of the basis vectors of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+, we can use this relationship, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:etilde_e"
+
+\end_inset
+
+, to get
+\begin_inset Formula 
+\begin{align*}
+\bar{\mathbf{e}}_{1} & =\cos\left(\phi\right)\left(\cos\left(\theta\right)\mathbf{e}_{1}+\sin\left(\theta\right)\mathbf{\mathbf{e}}_{2}\right)+\sin\left(\phi\right)\left(-\sin\left(\theta\right)\mathbf{e}_{1}+\cos\left(\theta\right)\mathbf{\mathbf{e}}_{2}\right)\\
+\bar{\mathbf{e}}_{2} & =-\sin\left(\phi\right)\left(\cos\left(\theta\right)\mathbf{e}_{1}+\sin\left(\theta\right)\mathbf{\mathbf{e}}_{2}\right)+\cos\left(\phi\right)\left(-\sin\left(\theta\right)\mathbf{e}_{1}+\cos\left(\theta\right)\mathbf{\mathbf{e}}_{2}\right)
+\end{align*}
+
+\end_inset
+
+rearranging terms gives us
+\begin_inset Formula 
+\begin{align*}
+\bar{\mathbf{e}}_{1} & =\left(\cos\left(\phi\right)\cos\left(\theta\right)-\sin\left(\phi\right)\sin\left(\theta\right)\right)\mathbf{e}_{1}+\left(\cos\left(\phi\right)\sin\left(\theta\right)+\sin\left(\phi\right)\cos\left(\theta\right)\right)\mathbf{\mathbf{e}}_{2}\\
+\bar{\mathbf{e}}_{2} & =\left(-\sin\left(\phi\right)\cos\left(\theta\right)-\cos\left(\phi\right)\sin\left(\theta\right)\right)\mathbf{e}_{1}+\left(-\sin\left(\phi\right)\sin\left(\theta\right)+\cos\left(\phi\right)\cos\left(\theta\right)\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be simplified to 
+\begin_inset Formula 
+\begin{align*}
+\bar{\mathbf{e}}_{1} & =\cos\left(\phi+\theta\right)\mathbf{e}_{1}+\sin\left(\phi+\theta\right)\mathbf{\mathbf{e}}_{2}\\
+\bar{\mathbf{e}}_{2} & =-\sin\left(\phi+\theta\right)\mathbf{e}_{1}+\cos\left(\phi+\theta\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It can be easily verified that the forward transformation is the product
+ of two matrices
+\begin_inset Formula 
+\[
+F_{3}^{1}=F_{3}^{2}F_{2}^{1}
+\]
+
+\end_inset
+
+and the backward transform is the transpose, i.e.,
+\begin_inset Formula 
+\begin{align*}
+B_{1}^{3} & =F_{3}^{1^{\top}}\\
+ & =\left(F_{3}^{2}F_{2}^{1}\right)^{\top}\\
+ & =F_{2}^{1^{\top}}F_{3}^{2\top}\\
+ & =B_{1}^{2}B_{2}^{3}
+\end{align*}
+
+\end_inset
+
+Note how the order of multiplication is backwards for the backward transform
+ 
+\end_layout
+
+\begin_layout Subsection
+Derivative of the Transformation Matrix
+\end_layout
+
+\begin_layout Standard
+Assume that 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ is fixed and that 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ is rotating w.r.t.
+ 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ with angular velocity 
+\begin_inset Formula $\omega$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $\theta$
+\end_inset
+
+ denote the initial rotation between the frames, 
+\begin_inset Formula $\phi=t\omega$
+\end_inset
+
+ be the change in angle after a time period 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ We want to calculate the derivative of the transformation along 
+\begin_inset Formula $\omega$
+\end_inset
+
+, this is done using the directional derivative for each basis relationship.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{subequations}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "eq:directionalDeriv2"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dt}\mathbf{\tilde{e}}_{1} & =\left.\frac{d}{dt}\left(\cos\left(\theta+t\omega\right)\mathbf{e}_{1}+\sin\left(\theta+t\omega\right)\mathbf{\mathbf{e}}_{2}\right)\right|_{t=0}\\
+\frac{d}{dt}\mathbf{\tilde{e}}_{2} & =\left.\frac{d}{dt}\left(-\sin\left(\theta+t\omega\right)\mathbf{e}_{1}+\cos\left(\theta+t\omega\right)\mathbf{\mathbf{e}}_{2}\right)\right|_{t=0}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{subequations}
+\end_layout
+
+\end_inset
+
+evaluating this expression gives
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dt}\mathbf{\tilde{e}}_{1} & =-\omega\sin\left(\theta\right)\mathbf{e}_{1}+\omega\cos\left(\omega\right)\mathbf{\mathbf{e}}_{2}\\
+\frac{d}{dt}\mathbf{\tilde{e}}_{2} & =-\omega\cos\left(\theta\right)\mathbf{e}_{1}+-\omega\sin\left(\theta\right)\mathbf{\mathbf{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix form as 
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dt}F_{2}^{1} & =\begin{bmatrix}0 & -\omega\\
+\omega & 0
+\end{bmatrix}\begin{bmatrix}\cos\left(\theta\right) & -\sin\left(\theta\right)\\
+\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\\
+ & =\begin{bmatrix}0 & -\omega\\
+\omega & 0
+\end{bmatrix}F_{2}^{1}\\
+ & =F_{2}^{1}\begin{bmatrix}0 & -\omega\\
+\omega & 0
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+and the derivative of the backwards transformation can be shown to be 
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dt}B_{1}^{2} & =B_{1}^{2}\begin{bmatrix}0 & \omega\\
+-\omega & 0
+\end{bmatrix}\\
+ & =\begin{bmatrix}0 & \omega\\
+-\omega & 0
+\end{bmatrix}B_{1}^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the transformation matrices can be multiplied on the left or right
+ by the matrix containing the angular velocities.
+ This is because the transformation matrices are elements of 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+ which is a group with the commutative property, i.e., 
+\begin_inset Formula $AB=BA,\,A,B\in SO\left(2\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The derivative of the transformation can be expressed differently which
+ will be helpful later on.
+ We begin with 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:directionalDeriv2"
+
+\end_inset
+
+ and separate the terms out to get 
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dt}\mathbf{\tilde{e}}_{1} & =\frac{d}{dt}\left.\left[\left(\cos\left(t\omega\right)\cos\left(\theta\right)-\sin\left(t\omega\right)\sin\left(\theta\right)\right)\mathbf{e}_{1}+\left(\cos\left(t\omega\right)\sin\left(\theta\right)+\sin\left(t\omega\right)\cos\left(\theta\right)\right)\mathbf{\mathbf{e}}_{2}\right]\right|_{t=0}\\
+\frac{d}{dt}\mathbf{\tilde{e}}_{2} & =\frac{d}{dt}\left.\left[\left(-\sin\left(t\omega\right)\cos\left(\theta\right)-\cos\left(t\omega\right)\sin\left(\theta\right)\right)\mathbf{e}_{1}+\left(-\sin\left(t\omega\right)\sin\left(\theta\right)+\cos\left(t\omega\right)\cos\left(\theta\right)\right)\mathbf{\mathbf{e}}_{2}\right]\right|_{t=0}
+\end{align*}
+
+\end_inset
+
+which can be represented in matrix form 
+\begin_inset Formula 
+\[
+\frac{d}{dt}\left.\left(\begin{bmatrix}\cos\left(t\omega\right) & -\sin\left(t\omega\right)\\
+\sin\left(t\omega\right) & \cos\left(t\omega\right)
+\end{bmatrix}\begin{bmatrix}\cos\left(\theta\right) & -\sin\left(\theta\right)\\
+\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\right)\right|_{t=0}
+\]
+
+\end_inset
+
+and since 
+\begin_inset Formula $\theta$
+\end_inset
+
+ doesn't depend on time, we can write the derivative as 
+\begin_inset Formula 
+\[
+\left(\frac{d}{dt}\left.\begin{bmatrix}\cos\left(t\omega\right) & -\sin\left(t\omega\right)\\
+\sin\left(t\omega\right) & \cos\left(t\omega\right)
+\end{bmatrix}\right|_{t=0}\begin{bmatrix}\cos\left(\theta\right) & -\sin\left(\theta\right)\\
+\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\right)
+\]
+
+\end_inset
+
+Evaluating the expression yields
+\begin_inset Formula 
+\[
+\begin{bmatrix}0 & -\omega\\
+\omega & 0
+\end{bmatrix}\begin{bmatrix}\cos\left(\theta\right) & -\sin\left(\theta\right)\\
+\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+which is the same result as above.
+ However, this matrix representation allows us to represent the change in
+ the direction of 
+\begin_inset Formula $\omega$
+\end_inset
+
+ as a transformation between frames.
+ This idea will come into play when finding the derivatives of 3-Dimesional
+ rotation matrices.
+ 
+\end_layout
+
+\begin_layout Subsection
+Transforming Vectors Between Frames
+\end_layout
+
+\begin_layout Standard
+Suppose we have a vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ in a space with frames 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ as shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:staticVector"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/VectorTransfromStatic2d.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:staticVector"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We know that we can represent the vector in terms of the basis of any frame,
+ so lets represent the vector w.r.t.
+ 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\[
+\mathbf{v}=\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}
+\]
+
+\end_inset
+
+We can easily represent it in 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ using the transformation between frames discussed in the previous sections
+ as such
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v} & =\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}\\
+ & =\alpha^{1}\left(\cos\left(\theta\right)\mathbf{\tilde{e}}_{1}+-\sin\left(\theta\right)\mathbf{\tilde{e}}_{2}\right)+\alpha^{2}\left(\sin\left(\theta\right)\mathbf{\tilde{e}}_{1}+\cos\left(\theta\right)\mathbf{\tilde{e}}_{2}\right)\\
+ & =\left(\alpha^{1}\cos\left(\theta\right)+\alpha^{2}\sin\left(\theta\right)\right)\mathbf{\tilde{e}}_{1}+\left(-\alpha^{1}\sin\left(\theta\right)+\alpha^{2}\cos\left(\theta\right)\right)\mathbf{\tilde{e}}_{2}
+\end{align*}
+
+\end_inset
+
+which can be represented using matrix multiplication
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v} & =\begin{bmatrix}\cos\left(\theta\right) & \sin\left(\theta\right)\\
+-\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}
+\end{bmatrix}\\
+ & =B_{1}^{2}\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that to transform the components of a vector from 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ we use the backward transform instead of the forward transform.
+ Hence the components of a vector transform contravariantly to that of the
+ basis.
+ This type of transformation can also be called a passive transformation
+ since the vector is static but the basis are changing.
+\end_layout
+
+\begin_layout Standard
+Remember that we said a vector is an object that is invariant to changes
+ in coordinates or frames.
+ In order for this to happen, the components of a vector must change 
+\begin_inset Quotes eld
+\end_inset
+
+opposite
+\begin_inset Quotes erd
+\end_inset
+
+ to the change in basis.
+ We will give a better example of this shortly; however, we want to give
+ you another example of a change in coordinates using non-orthonormal basis
+ so it is very clear that vector components are contravarient.
+\end_layout
+
+\begin_layout Subsection
+Rotating a Vector in a Frame
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/VectorDynamic.pdf
+	width 40col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:vectoryDynamics"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:vectoryDynamics"
+
+\end_inset
+
+, and suppose we have a vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ rotating in frame 
+\begin_inset Formula $\mathcal{F}=\left(O,\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} \right)$
+\end_inset
+
+ at angular velocity 
+\begin_inset Formula $\omega$
+\end_inset
+
+.
+ At 
+\begin_inset Formula $t=0$
+\end_inset
+
+ the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ can be expressed w.r.t.
+ 
+\begin_inset Formula $\mathcal{F}$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\[
+\mathbf{v}=\left\Vert \mathbf{v}\right\Vert \cos\left(\theta\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \sin\left(\theta\right)\mathbf{e}_{2}
+\]
+
+\end_inset
+
+and at 
+\begin_inset Formula $t>0$
+\end_inset
+
+ the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is denoted as 
+\begin_inset Formula $\mathbf{v}'$
+\end_inset
+
+ and can be expressed as 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v}' & =\left\Vert \mathbf{v}'\right\Vert \cos\left(\theta+t\omega\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}'\right\Vert \sin\left(\theta+t\omega\right)\mathbf{e}_{2}\\
+ & =\left\Vert \mathbf{v}\right\Vert \cos\left(\theta+t\omega\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \sin\left(\theta+t\omega\right)\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This change in the orientation of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ can be described using a transformation, which we derive as following
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v}' & =\left\Vert \mathbf{v}\right\Vert \cos\left(\theta+t\omega\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \sin\left(\theta+t\omega\right)\mathbf{e}_{2}\\
+ & =\left\Vert \mathbf{v}\right\Vert \left(\cos\left(\theta\right)\cos\left(t\omega\right)-\sin\left(\theta\right)\sin\left(t\omega\right)\right)\mathbf{e}_{1}+\left\Vert \mathbf{v}\right\Vert \left(\sin\left(\theta\right)\cos\left(t\omega\right)+\cos\left(\theta\right)\sin\left(t\omega\right)\right)\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+and in matrix notation
+\begin_inset Formula 
+\[
+\mathbf{v}'=\begin{bmatrix}\cos\left(t\omega\right) & -\sin\left(t\omega\right)\\
+\sin\left(t\omega\right) & \cos\left(t\omega\right)
+\end{bmatrix}\begin{bmatrix}\left\Vert \mathbf{v}\right\Vert \cos\left(\theta\right)\\
+\left\Vert \mathbf{v}\right\Vert \sin\left(\theta\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{bmatrix}\cos\left(t\omega\right) & -\sin\left(t\omega\right)\\
+\sin\left(t\omega\right) & \cos\left(t\omega\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+is like a forward transformation.
+ Some people will refer to this as an active transformation since the vector
+ is moving and the basis is static.
+ 
+\end_layout
+
+\begin_layout Subsection
+Rotation Matrices
+\end_layout
+
+\begin_layout Standard
+When the forward and backward transformations are orthonormal, then they
+ are elements of the Orthogonal group denoted 
+\begin_inset Formula $O\left(n\right)\coloneqq\left\{ M\in\mathbb{R}^{n\times n}|M^{\top}M=I\right\} $
+\end_inset
+
+.
+ When the forward and backward transformations are orthonormal and have
+ a determinate of 1, then they are elements of the Special Orthogonal group
+ denoted 
+\begin_inset Formula $SO\left(n\right)\coloneqq\left\{ R\in\mathbb{R}^{n\times n}|R^{\top}R=I,\,\text{det}\left(R\right)=1\right\} $
+\end_inset
+
+.
+ We usually refer to elements of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ and rotation matrices.
+ The rotation matrices of 
+\begin_inset Formula $SO\left(n\right)$
+\end_inset
+
+ are widely used in modeling mechanical systems since they are isometries,
+ i.e., they preserve length, and are path connected, i.e., from one element
+ in the group you can move along a path to any other element.
+ 
+\end_layout
+
+\begin_layout Standard
+We have already used rotation matrices of 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+, but we will express them again as 
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}\cos\left(\theta\right) & \pm\sin\left(\theta\right)\\
+\mp\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}\in SO\left(2\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the angle between vectors, and the plus/minus is to distinguish between
+ a forward and backwards transformation.
+ 
+\end_layout
+
+\begin_layout Standard
+Even if mechanical systems are confined to a 1-dimensional or 2-dimensional
+ space, they inherently live in 3 dimensional space.
+ We can embed a mechanical system that is confined to a 1,2-dimensional
+ space in 3-dimensional space.
+ Since there are no rotations in a 1-dimensional space, the embedding is
+ the identity element of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+.
+ The rotation matrices that define rotations in 2-dimensions can be embedded
+ into 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ in an infinite amount of ways; however, there are three that are most common.
+ 
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathcal{F}^{1}=\left(O,\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} \right)$
+\end_inset
+
+ be a frame in 
+\begin_inset Formula $\mathbb{R}^{3}$
+\end_inset
+
+, then the common embeddings of 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+ into 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\begin{align*}
+R_{3} & =\begin{bmatrix}\cos\left(\theta\right) & \pm\sin\left(\theta\right) & 0\\
+\mp\sin\left(\theta\right) & \cos\left(\theta\right) & 0\\
+0 & 0 & 1
+\end{bmatrix}\\
+R_{2} & =\begin{bmatrix}\cos\left(\theta\right) & 0 & \pm\sin\left(\theta\right)\\
+0 & 1 & 0\\
+\mp\sin\left(\theta\right) & 0 & \cos\left(\theta\right)
+\end{bmatrix}\\
+R_{1} & =\begin{bmatrix}1 & 0 & 0\\
+0 & \cos\left(\theta\right) & \pm\sin\left(\theta\right)\\
+0 & \mp\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $R_{a},\,a\in\left\{ 1,2,3\right\} $
+\end_inset
+
+ is the rotation about the basis
+\begin_inset Formula $\mathbf{e}_{a}$
+\end_inset
+
+ by angle 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+ The signs associated with the function 
+\begin_inset Formula $\sin$
+\end_inset
+
+ are determined by how the coordinate 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is defined and if the transformation is a forward or backwards transformation.
+ If we restrict our frames to be right handed frames, then the three correspondi
+ng embedded backwards transformations are 
+\begin_inset Formula 
+\begin{align*}
+R_{3} & =\begin{bmatrix}\cos\left(\theta\right) & \sin\left(\theta\right) & 0\\
+-\sin\left(\theta\right) & \cos\left(\theta\right) & 0\\
+0 & 0 & 1
+\end{bmatrix}\\
+R_{2} & =\begin{bmatrix}\cos\left(\theta\right) & 0 & -\sin\left(\theta\right)\\
+0 & 1 & 0\\
+\sin\left(\theta\right) & 0 & \cos\left(\theta\right)
+\end{bmatrix}\\
+R_{1} & =\begin{bmatrix}1 & 0 & 0\\
+0 & \cos\left(\theta\right) & \sin\left(\theta\right)\\
+0 & -\sin\left(\theta\right) & \cos\left(\theta\right)
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+which are usually accompanied by superscripts and subscripts as follows
+ 
+\begin_inset Formula 
+\[
+R_{1,a}^{2},\,a\in\left\{ 1,2,3\right\} 
+\]
+
+\end_inset
+
+to denote that the rotation matrix is a rotation about basis 
+\begin_inset Formula $a$
+\end_inset
+
+ which transforms the components of a vector expressed in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ to be expressed in frame 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+.
+ For example, let the vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ be expressed in 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ measured w.r.t.
+ to 
+\begin_inset Formula $O_{1}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{v}_{v/1}^{1} & =\alpha^{1}\mathbf{e}_{1}+\alpha^{2}\mathbf{e}_{2}+\alpha^{3}\mathbf{e}_{3}\\
+ & =\begin{bmatrix}\alpha^{1}\\
+\alpha^{2}\\
+\alpha^{3}
+\end{bmatrix}
+\end{align*}
+
+\end_inset
+
+where the superscript indicates which frame it is being expressed in, and
+ the sub scripts indicate that it is a vector being measured from 
+\begin_inset Formula $v$
+\end_inset
+
+, the end point of the vector, to the origin of 
+\begin_inset Formula $O_{1}$
+\end_inset
+
+.
+ The vector's components can be rotated to be expressed in frame 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ as such
+\begin_inset Formula 
+\[
+\mathbf{v}_{v/2}^{2}=R_{1}^{2}\mathbf{v}_{v/1}^{1}
+\]
+
+\end_inset
+
+Since the origin of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ are coincident, we can interchange the subscript.
+ Remember that 
+\begin_inset Formula $R_{1}^{2}$
+\end_inset
+
+ is the backward transformation.
+ 
+\end_layout
+
+\begin_layout Standard
+We now have sufficient preliminaries to discuss rotation matrices in 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ that are not embeddings of 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Rotation Matrices in 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We will begin with the geometric representation without any coordinates
+ and utilize the frames 
+\begin_inset Formula $\mathcal{F}^{1}=\left(O_{1},\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} \right)$
+\end_inset
+
+, 
+\begin_inset Formula $\mathcal{F}^{2}=\left(O_{2},\left\{ \tilde{\mathbf{e}}_{1},\tilde{\mathbf{e}}_{2},\tilde{\mathbf{e}}_{3}\right\} \right)$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathcal{F}^{3}=\left(O_{3},\left\{ \bar{\mathbf{e}}_{1},\bar{\mathbf{e}}_{2},\bar{\mathbf{e}}_{3}\right\} \right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/SO3_changeOfBasis.pdf
+	width 80col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:SO3_changeBasis"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:SO3_changeBasis"
+
+\end_inset
+
+ shows a depiction of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ in Euclidean space.
+ We can express the basis of 
+\begin_inset Formula $\mathcal{F}^{2}$
+\end_inset
+
+ in terms of the bases of 
+\begin_inset Formula $\mathcal{F}^{1}$
+\end_inset
+
+ as follows
+\begin_inset Formula 
+\begin{align*}
+\tilde{\mathbf{e}}_{1} & =\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}\\
+\tilde{\mathbf{e}}_{2} & =\left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+\left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}\\
+\tilde{\mathbf{e}}_{3} & =\left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{1}\right)\mathbf{e}_{1}+\left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}+\left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{2}\right)\mathbf{e}_{2}
+\end{align*}
+
+\end_inset
+
+and construct the matrix representation of the forward and backward transformati
+on matrices
+\begin_inset Formula 
+\begin{align*}
+F & =R_{2}^{1}=\begin{bmatrix}\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{1}\right) & \left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{1}\right) & \left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{1}\right)\\
+\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{2}\right) & \left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{2}\right) & \left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{2}\right)\\
+\left(\tilde{\mathbf{e}}_{1}\cdot\mathbf{e}_{3}\right) & \left(\tilde{\mathbf{e}}_{2}\cdot\mathbf{e}_{3}\right) & \left(\tilde{\mathbf{e}}_{3}\cdot\mathbf{e}_{3}\right)
+\end{bmatrix}\\
+B & =R_{1}^{2}=F^{\top}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You might be thinking, 
+\begin_inset Quotes eld
+\end_inset
+
+Oh great, that's cool but what are the inner products between the bases.
+\begin_inset Quotes erd
+\end_inset
+
+ The answer to that question might not be satisfactory, but the inner products
+ are exact geometric measurements that requires you to measure each basis
+ in terms of the other bases.
+ You could represent each inner product as a function of the angle between
+ bases like we did with 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+ and get something like 
+\begin_inset Formula 
+\[
+F=\begin{bmatrix}\cos\left(\theta_{1,1}\right) & \cos\left(\theta_{2,1}\right) & \cos\left(\theta_{3,1}\right)\\
+\cos\left(\theta_{1,2}\right) & \cos\left(\theta_{2,2}\right) & \cos\left(\theta_{3,2}\right)\\
+\cos\left(\theta_{1,3}\right) & \cos\left(\theta_{2,3}\right) & \cos\left(\theta_{3,3}\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+and then measure the all 9 angles between each basis.
+ We could leverage the properties of a rotation matrix, 
+\begin_inset Formula $R^{\top}R=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\text{det}\left(R\right)=1$
+\end_inset
+
+, to construct constraints 
+\begin_inset Formula 
+\begin{align*}
+a_{11}^{2}+a_{12}^{2}+a_{13}^{2} & =1\\
+a_{21}^{2}+a_{22}^{2}+a_{23}^{2} & =1\\
+a_{31}^{2}+a_{32}^{2}+a_{33}^{2} & =1\\
+a_{11}a_{21}+a_{12}a_{22}+a_{13}a_{23} & =0\\
+a_{11}a_{31}+a_{12}a_{32}+a_{13}a_{33} & =0\\
+a_{21}a_{31}+a_{22}a_{32}+a_{23}a_{33} & =0\\
+\det\left(R\right) & =1
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $a_{i,j}=\left(\tilde{\mathbf{e}}_{i}\cdot\mathbf{e}_{j}\right),\,i,j\in\left\{ 1,2,3\right\} $
+\end_inset
+
+.
+ Even though there are equations constraints, there are only 6 constraints.
+ The first 6 equations guarantee that the determinant of 
+\begin_inset Formula $R$
+\end_inset
+
+ will be 
+\begin_inset Formula $\pm1$
+\end_inset
+
+, and the last equation ensures that the determinant is 1, and is thus a
+ rotation matrix.
+ These constraints indicate that even though an element of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ has 9 components, it only has three degrees of freedom.
+ Even with the constraints it is difficult to parametrize a rotation matrix
+ of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ with only 3 coordinates.
+ One method is Euler angles, which maps three different angles 
+\begin_inset Formula $\theta_{1},\theta_{2},\theta_{3}$
+\end_inset
+
+ to a rotation matrix 
+\begin_inset Formula $R$
+\end_inset
+
+ by having each angle represent a rotation about a basis by the angle.
+ For example the map 
+\begin_inset Formula $f:\mathbb{R}^{3}\to SO\left(3\right)$
+\end_inset
+
+ can be 
+\begin_inset Formula 
+\[
+R=\begin{bmatrix}\cos\left(\theta_{1}\right) & \sin\left(\theta_{1}\right) & 0\\
+-\sin\left(\theta_{1}\right) & \cos\left(\theta_{1}\right) & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\cos\left(\theta_{2}\right) & 0 & -\sin\left(\theta_{2}\right)\\
+0 & 1 & 0\\
+\sin\left(\theta_{2}\right) & 0 & \cos\left(\theta_{2}\right)
+\end{bmatrix}\begin{bmatrix}1 & 0 & 0\\
+0 & \cos\left(\theta_{3}\right) & \sin\left(\theta_{3}\right)\\
+0 & -\sin\left(\theta_{3}\right) & \cos\left(\theta_{3}\right)
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Unfortunately this is not a bijective map and so 
+\begin_inset Formula $\mathbb{R}^{3}$
+\end_inset
+
+ is not homeomorphic to 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+, and you can get into singularities using Euler angles.
+ However, they are locally homeomorphic and can be used to construct the
+ rotation matrix in the regions of their respective spaces where they are
+ locally homeomorphic.
+ 
+\end_layout
+
+\begin_layout Standard
+There are other methods to represent rotation matrices in a minimal form,
+ but they are not the purpose of this document.
+ Let it suffice that rotation matrices of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+ have 3 degrees of freedom, and can be constructed from their geometric
+ meaning.
+\end_layout
+
+\begin_layout Subsection
+Active and Passive Transformations
+\end_layout
+
+\begin_layout Standard
+Just like with 
+\begin_inset Formula $SO\left(2\right)$
+\end_inset
+
+, a passive transformation of a vector is the backwards transformation,
+ and the active transformation is like a forward transformation.
+\end_layout
+
+\end_body
+\end_document

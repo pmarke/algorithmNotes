@@ -1,0 +1,755 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Centralized Fusion with the Indirect Kalman Filter
+\end_layout
+
+\begin_layout Standard
+Let the state of the target at time 
+\begin_inset Formula $t$
+\end_inset
+
+ be defined as the random variable 
+\begin_inset Formula 
+\[
+x_{t}=\hat{x}_{t}\exp\left(\tilde{x}_{t}\right),
+\]
+
+\end_inset
+
+where the state, 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+, is an element of the Lie group 
+\begin_inset Formula $G^{x}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{x}_{t}\in G^{x}$
+\end_inset
+
+ denotes the state estimate and 
+\begin_inset Formula $\tilde{x}_{t}$
+\end_inset
+
+ denotes the error state which is a Gaussian random variable with mean 
+\begin_inset Formula $\mu_{t}$
+\end_inset
+
+ and covariance 
+\begin_inset Formula $P_{t}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{align*}
+\tilde{x}_{t} & \sim\mathcal{N}\left(\mu_{t}=0,P_{t}\right)\\
+x_{t} & \sim\mathcal{N}\left(\hat{x}_{t},P_{t}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+p\left(\tilde{x}_{t}\right) & =\eta\exp\left(-\frac{1}{2}\tilde{x}_{t}^{\top}P_{t}^{-1}\tilde{x}_{t}\right)\\
+p\left(x_{t}\right) & =\eta\exp\left(-\frac{1}{2}\log\left(x_{t},\hat{x}_{t}\right)P_{t}^{-1}\log\left(x_{t},\hat{x}_{t}\right)\right)\\
+ & =\eta\exp\left(-\frac{1}{2}\tilde{x}_{t}^{\top}P_{t}^{-1}\tilde{x}_{t}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is assumed that the target is observed by multiple sensors.
+ Let 
+\begin_inset Formula $\mathcal{S}=\left\{ 1,2,3\ldots\right\} $
+\end_inset
+
+ denote the indexing set of independent sensors and let the observation
+ function be defined generically as 
+\begin_inset Formula 
+\[
+z_{t}^{s_{i}}=h^{s_{i}}\left(x_{t},r_{t}^{s_{i}}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $z_{t}^{s_{i}}$
+\end_inset
+
+ is a measurement from sensor 
+\begin_inset Formula $s_{i}\in\mathcal{S}$
+\end_inset
+
+ at timestep 
+\begin_inset Formula $t$
+\end_inset
+
+ and is an element of the Lie group 
+\begin_inset Formula $G^{S_{i}}$
+\end_inset
+
+, 
+\begin_inset Formula $h^{s_{i}}$
+\end_inset
+
+ is the observation function corresponding to the sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+, and 
+\begin_inset Formula $r^{s_{i}}\sim\mathcal{N}\left(0,R^{s_{i}}\right)$
+\end_inset
+
+ the measurement noise from sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The indirect Kalman filter uses hard data assocition, which means that at
+ most only one measurement from each sensor is associated to the track per
+ time step.
+ Let 
+\begin_inset Formula $z_{t}^{s_{i}}$
+\end_inset
+
+ denote the associated measurement from sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+ at time step 
+\begin_inset Formula $t$
+\end_inset
+
+, and let 
+\begin_inset Formula $\mathsf{S}=\left\{ s_{i},s_{j},\ldots,s_{k}\right\} \subset\mathcal{S}$
+\end_inset
+
+ denote the subset of sensors that produced measurements at timestep 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ Using the measurements 
+\begin_inset Formula $z_{t}^{s_{i}},z_{t}^{s_{j}},\ldots,z_{t}^{s_{k}}$
+\end_inset
+
+ we can create a pseudo measurement as an element of the direct product
+ space of 
+\begin_inset Formula $G^{s_{i}},G^{s_{j}},\ldots,G^{s_{k}}$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula 
+\[
+z_{t}^{\mathsf{S}}=\left(z_{t}^{s_{i}},z_{t}^{s_{j}},\ldots,z_{t}^{s_{k}}\right)\in G^{s_{i}}\times G^{s_{j}}\times\cdots\times G^{s_{k}}.
+\]
+
+\end_inset
+
+The corresponding pseudo observation function is 
+\begin_inset Formula 
+\[
+h^{\mathsf{S}}\left(x_{t},r_{t}^{S}\right)=\left(h^{s_{i}}\left(x_{t},r_{t}^{s_{i}}\right),h^{s_{j}}\left(x_{t},r_{t}^{s_{j}}\right),\ldots,h^{s_{k}}\left(x_{t},r_{t}^{s_{k}}\right)\right)
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $r^{\mathsf{S}}\sim\mathcal{N}\left(0,R^{\mathsf{S}}\right)$
+\end_inset
+
+, and the pseudo measurement noise covariance is
+\begin_inset Formula 
+\[
+R^{\mathsf{S}}=\begin{bmatrix}R^{s_{i}} & 0 & \cdots & 0\\
+0 & R^{s_{j}} & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & R^{s_{k}}
+\end{bmatrix},
+\]
+
+\end_inset
+
+which is a block diagonal matrix reflecting that the sensors are independent.
+ 
+\end_layout
+
+\begin_layout Standard
+Let the Jacobian of the pseudo observation funtion w.r.t.
+ to the state and measurement noise be denoted as
+\begin_inset Formula 
+\[
+H^{\mathsf{S}}=\frac{\partial h^{\mathsf{S}}}{\partial x}=\begin{bmatrix}H^{s_{i}}\\
+H^{s_{j}}\\
+\vdots\\
+H^{s_{k}}
+\end{bmatrix},
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+V^{\mathsf{S}}=\frac{\partial h^{\mathsf{S}}}{\partial x}=\begin{bmatrix}V^{s_{i}} & 0 & \cdots & 0\\
+0 & V^{s_{j}} & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & V^{s_{k}}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It follow directly from the indirect Kalman filter that the update is 
+\begin_inset Formula 
+\begin{align*}
+\nu_{t}^{\mathsf{S}} & =\log\left(z_{t}^{\mathsf{S}},h^{\mathsf{S}}\left(\hat{x}_{t\mid t^{-}},0\right)\right)\\
+P_{t\mid t}^{-} & =\left(P_{t\mid t^{-}}+\left(H_{t}^{\mathsf{S}}\right)^{\top}\left(V_{t}^{\mathsf{S}}R^{\mathsf{S}}\left(V_{t}^{\mathsf{S}}\right)^{\top}\right)^{-1}H_{t}^{\mathsf{S}}\right)^{-1}\\
+\mu_{t\mid t}^{-} & =P_{t\mid t}^{-}\left(H_{t}^{\mathsf{S}}\right)^{\top}\left(V_{t}^{\mathsf{S}}R^{\mathsf{S}}\left(V_{t}^{\mathsf{S}}\right)^{\top}\right)^{-1}\nu_{t}^{\mathsf{S}}.
+\end{align*}
+
+\end_inset
+
+Since 
+\begin_inset Formula $V_{t}^{\mathsf{S}}$
+\end_inset
+
+ and 
+\begin_inset Formula $R^{\mathsf{S}}$
+\end_inset
+
+ are block diagonal matrices, we can rewrite the update step as 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\nu_{t}^{\mathsf{s_{\ell}}} & =\log\left(z_{t}^{\mathsf{s_{\ell}}},h^{\mathsf{s_{\ell}}}\left(\hat{x}_{t\mid t^{-}},0\right)\right)\\
+P_{t\mid t}^{-} & =\left(P_{t\mid t^{-}}+\sum_{s_{\ell}\in\mathsf{S}}\left(H_{t}^{\mathsf{s_{\ell}}}\right)^{\top}\left(V_{t}^{\mathsf{s_{\ell}}}R^{\mathsf{s_{\ell}}}\left(V_{t}^{\mathsf{s_{\ell}}}\right)^{\top}\right)^{-1}H_{t}^{\mathsf{s_{\ell}}}\right)^{-1}\\
+\mu_{t\mid t}^{-} & =P_{t\mid t}^{-}\left(H_{t}^{\mathsf{s_{\ell}}}\right)^{\top}\left(V_{t}^{\mathsf{s_{\ell}}}R^{\mathsf{s_{\ell}}}\left(V_{t}^{\mathsf{s_{\ell}}}\right)^{\top}\right)^{-1}\nu_{t}^{\mathsf{s_{\ell}}}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Other Notes
+\end_layout
+
+\begin_layout Standard
+The update step of the indirect Kalman filter seeks to update the mean of
+ the error state such that the probability 
+\begin_inset Formula 
+\[
+p\left(x_{t}\mid Z_{0:t}\right)=\frac{p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)p\left(x_{t}\mid Z_{0:t^{-}}\right)}{p\left(z_{t}^{\mathsf{S}}\mid Z_{0:t^{-}}\right)}
+\]
+
+\end_inset
+
+is maximized.
+ This optimization doesn't depend on 
+\begin_inset Formula $p\left(z_{t}^{\mathsf{S}}\mid Z_{0:t^{-}}\right)$
+\end_inset
+
+ so it can be dropped and we get the optimization 
+\begin_inset Formula 
+\begin{align*}
+p\left(x_{t}\mid Z_{0:t}\right) & =\max_{\mu_{t\mid t}^{-}}p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)p\left(x_{t}\mid Z_{0:t^{-}}\right).\\
+ & =\max_{\mu_{t\mid t}^{-}}p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)p\left(\tilde{x}_{t}\mid Z_{0:t^{-}}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order to ensure that 
+\begin_inset Formula $p\left(x_{t}\mid Z_{0:t}\right)$
+\end_inset
+
+ is Gaussian, we approximate 
+\begin_inset Formula $p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)$
+\end_inset
+
+ as Gaussian.
+ This approximation requires linearizing the pseudo observation function;
+ thus, 
+\begin_inset Formula 
+\[
+z_{t}^{\mathsf{S}}\approx h^{\mathsf{S}}\left(\hat{x}_{t}\right)\exp\left(H^{\mathsf{S}}\tilde{x}_{t}+V^{\mathsf{S}}r^{\mathsf{S}}\right),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+H^{\mathsf{S}}=\frac{\partial h^{\mathsf{S}}}{\partial x}=\begin{bmatrix}H^{s_{i}}\\
+H^{s_{j}}\\
+\vdots\\
+H^{s_{k}}
+\end{bmatrix},
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+V^{\mathsf{S}}=\frac{\partial h^{\mathsf{S}}}{\partial x}=\begin{bmatrix}V^{s_{i}} & 0 & \cdots & 0\\
+0 & V^{s_{j}} & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & V^{s_{k}}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the linearization of the observation function, the probability of
+ 
+\begin_inset Formula $p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)$
+\end_inset
+
+ is approximated as Gaussian as 
+\begin_inset Formula 
+\[
+p\left(z_{t}^{\mathsf{S}}\mid x_{t},Z_{0:t^{-}}\right)\approx
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Centralized Fusion with the PDAF
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathcal{S}=\left\{ 1,2,3\ldots\right\} $
+\end_inset
+
+ denote the indexing set of independent sensors and let the observation
+ function be defined generically as 
+\begin_inset Formula 
+\[
+z_{t}^{s_{i}}=h^{s_{i}}\left(x_{t},r_{t}^{s_{i}}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $z^{s_{i}}$
+\end_inset
+
+ is a measurement from sensor 
+\begin_inset Formula $s_{i}\in\mathcal{S}$
+\end_inset
+
+ at timestep 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $h^{s_{i}}$
+\end_inset
+
+ is the observation function corresponding to the sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{t}\sim\mathcal{N}\left(\hat{x}_{t},P\right)$
+\end_inset
+
+ the state of the target and 
+\begin_inset Formula $r^{s_{i}}\sim\mathcal{N}\left(0,R^{s_{i}}\right)$
+\end_inset
+
+ the measurement noise from sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+At timestep 
+\begin_inset Formula $t$
+\end_inset
+
+, the sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+ produces 
+\begin_inset Formula $m_{t}^{s_{i}}$
+\end_inset
+
+ validated measurements.
+ The sets of validated measurements from sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+ is denoted
+\begin_inset Formula 
+\[
+Z_{t}^{s_{i}}=\left\{ z_{t,\ell}^{s_{i}}\right\} _{\ell=0}^{m_{k}^{s_{i}}},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $z_{t,a}^{s_{i}}$
+\end_inset
+
+ denotes the 
+\begin_inset Formula $a^{th}$
+\end_inset
+
+ validated measurement from sensor 
+\begin_inset Formula $s_{i}$
+\end_inset
+
+.
+ The PDAF assumes that at most only one measurement originated from the
+ target and all other measurements are clutter.
+ Thus, given the set of measurements 
+\begin_inset Formula $Z_{t}^{s_{i}}$
+\end_inset
+
+, either one of the measurements originated from the target or none of them.
+ This implies that there are 
+\begin_inset Formula $m_{t}^{s_{i}}+1$
+\end_inset
+
+ association events that we denote as 
+\begin_inset Formula $\theta_{t,a}^{s_{i}}$
+\end_inset
+
+ where 
+\begin_inset Formula 
+\[
+\theta_{t,\ell}^{s_{i}}=\begin{cases}
+\text{measurement \ensuremath{z_{t,\ell}^{s_{i}}} originated from the target} & 0<\ell<m_{t}^{s_{i}}\\
+\text{all measurements are clutter} & \ell=0
+\end{cases}.
+\]
+
+\end_inset
+
+We denote the probability of each association event as 
+\begin_inset Formula $\beta_{t,a}^{s_{i}}$
+\end_inset
+
+ which is calculated using the standard PDAF.
+ 
+\end_layout
+
+\begin_layout Standard
+In the case that multiple sensors produce measurements at the same time
+ step we need to be able to fuse the measurement together.
+ We do this by creating a pseudo measurement, pseudo observation function,
+ and pseudo measurement covariance.
+ Let 
+\begin_inset Formula $\mathsf{S}=\left\{ s_{i},s_{j},\ldots,s_{k}\right\} \subset\mathcal{S}$
+\end_inset
+
+ denote the subset of sensors that produced measurements at timestep 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula 
+\[
+\mathcal{A}^{\mathsf{S}}=\left\{ \left(\alpha_{i},\alpha_{j},\ldots,\alpha_{k}\right)\in\mathbb{Z}^{\left|\mathsf{S}\right|}\mid0<\alpha_{\ell}<m_{t}^{s_{\ell}}\right\} 
+\]
+
+\end_inset
+
+ be an indexing set.
+ Let 
+\begin_inset Formula $\alpha\in\mathcal{A}^{\mathsf{S}}$
+\end_inset
+
+, we denote a joint association event as 
+\begin_inset Formula 
+\[
+\theta_{t,\alpha}^{\mathsf{S}}=\theta_{t,\alpha_{a}}^{s_{i}}\cap\theta_{t,\alpha_{b}}^{s_{j}}\cap\cdots\cap\theta_{t,\alpha_{c}}^{s_{k}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given the association event 
+\begin_inset Formula $\theta_{t,\alpha}^{\mathsf{S}}$
+\end_inset
+
+, the corresponding pseudo measurement is 
+\begin_inset Formula 
+\[
+z_{\alpha}^{\mathsf{s}}=\left(z_{t,\alpha_{a}}^{s_{i}},z_{t,\alpha_{b}}^{s_{j}},\ldots,z_{t,\alpha_{c}}^{s_{k}}\right),
+\]
+
+\end_inset
+
+the corresponding pseudo observation function and Jacobian are 
+\begin_inset Formula 
+\begin{align*}
+h_{\alpha}^{\mathsf{s}} & =\left(h^{s_{i}},h^{s_{j}},\ldots,h^{s_{\ell}}\right)\\
+H_{\alpha}^{\mathsf{S}} & =\begin{bmatrix}H^{s_{i}}\\
+H^{s_{j}}\\
+\vdots\\
+H^{s_{\ell}}
+\end{bmatrix},
+\end{align*}
+
+\end_inset
+
+and the corresponding measurement noise covariance is the block matrix
+\begin_inset Formula 
+\[
+R_{\alpha}^{\mathsf{S}}=\begin{bmatrix}R^{s_{i}} & 0 & \cdots & 0\\
+0 & R^{s_{j}} & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & R^{s_{k}}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the case that one or more of the subscripts 
+\begin_inset Formula $\alpha_{\ell}=0$
+\end_inset
+
+, the corresponding measurement does not exist so the entry is omitted.
+ For example, if 
+\begin_inset Formula $\alpha_{a}=0$
+\end_inset
+
+, then the under the assumption of the association event 
+\begin_inset Formula $\theta_{t,\alpha_{a}}^{s_{i}}$
+\end_inset
+
+ none of the measurements from sensor 
+\begin_inset Formula $s_{j}$
+\end_inset
+
+ originated from the target; thus, the corresponding pseudo measurement
+ of 
+\begin_inset Formula $\theta_{t,\alpha}^{\mathsf{S}}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\[
+z_{\alpha}^{\mathsf{s}}=\left(z_{t,\alpha_{b}}^{s_{j}},\ldots,z_{t,\alpha_{c}}^{s_{k}}\right),
+\]
+
+\end_inset
+
+the corresponding pseudo observation function is 
+\begin_inset Formula 
+\begin{align*}
+h_{\alpha}^{\mathsf{s}} & =\left(h^{s_{j}},\ldots,h^{s_{\ell}}\right).\\
+H_{\alpha}^{\mathsf{S}} & =\begin{bmatrix}H^{s_{j}}\\
+\vdots\\
+H^{s_{\ell}}
+\end{bmatrix},
+\end{align*}
+
+\end_inset
+
+and the corresponding measurement noise covariance is 
+\begin_inset Formula 
+\[
+R_{\alpha}^{\mathsf{S}}=\begin{bmatrix}R^{s_{j}} & \cdots & 0\\
+\vdots & \ddots & \vdots\\
+0 & \cdots & R^{s_{k}}
+\end{bmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since sensors are independent, the probability of a joint association event
+ is the product of the probabilities of each association event; thus, the
+ probability of the association event 
+\begin_inset Formula $\theta_{t,\alpha}^{\mathsf{S}}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\[
+\beta_{t,\alpha}^{\mathsf{S}}=\beta_{t,\alpha_{a}}^{s_{i}}\beta_{t,\alpha_{b}}^{s_{j}}\cdots\beta_{t,\alpha_{c}}^{\beta_{k}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula 
+\[
+P_{t\mid t,\alpha}^{\mathsf{S}}=\left(P_{t\mid t^{-}}^{-1}+\left(H_{\alpha}^{\mathsf{S}}\right)^{\top}R_{\alpha}^{\mathsf{S}}H_{\alpha}^{\mathsf{S}}\right)^{-1},
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+\nu_{t,\alpha}^{\mathsf{S}}=\log\left(z_{t,\alpha}^{\mathsf{S}},h_{\alpha}^{\mathsf{S}}\left(\hat{x}_{t\mid t^{-}}\right)\right).
+\]
+
+\end_inset
+
+In the case that 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is the zero element, 
+\begin_inset Formula 
+\[
+P_{t\mid t,\alpha=0}^{\mathsf{S}}=P_{t\mid t^{-}}.
+\]
+
+\end_inset
+
+The update of the mean of the error state and covariance are
+\begin_inset Formula 
+\begin{align*}
+\mu_{t,\alpha} & =P_{t\mid t,\alpha}^{\mathsf{S}}\left(H_{\alpha}^{\mathsf{S}}\right)^{\top}\left(R_{\alpha}^{\mathsf{S}}\right)^{-1}\nu_{t,\alpha}^{\mathsf{S}}\\
+\mu_{t} & =\sum_{\alpha\in\mathcal{A}^{\mathsf{S}}/0}\mu_{t,\alpha}\beta_{t,\alpha}^{\mathsf{S}}
+\end{align*}
+
+\end_inset
+
+and the covariance update is 
+\begin_inset Formula 
+\[
+P_{t\mid t}=\sum_{\alpha\in\mathcal{A}^{\mathsf{S}}}P_{t\mid t,\alpha}^{\mathsf{S}}\beta_{t,\alpha}^{\mathsf{S}}+\sum_{\alpha\in\mathcal{A}^{\mathsf{S}}/0}\beta_{t,\alpha}^{\mathsf{S}}\mu_{t,\alpha}\left(\mu_{t,\alpha}\right)^{\top}-\mu_{t}\left(\mu_{t}\right)^{\top}
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\end_body
+\end_document

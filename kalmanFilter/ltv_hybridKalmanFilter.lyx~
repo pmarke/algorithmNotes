@@ -1,0 +1,3498 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{algorithm,algpseudocode}
+\end_preamble
+\use_default_options true
+\begin_modules
+theorems-ams
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Kalman Filter
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+The Kalman Filter was developed by R.E.
+ Kalman who presented his work in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman1961"
+
+\end_inset
+
+ shortly after publishing his work on optimal control 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman2010"
+
+\end_inset
+
+ and the duality between observability and controllability 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman1959"
+
+\end_inset
+
+.
+ The Kalman Filter was designed mathematically to optimally minimize the
+ error covariance in the estimation of linear systems.
+ It is also a type of Riccati Observer.
+ 
+\end_layout
+
+\begin_layout Standard
+In this note, I will not derive the Kalman Filter.
+ That has been done extensively in various varieties 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman1961,Bucy1968,Reid2001,Reid2001a"
+
+\end_inset
+
+.
+ The purpose of this note is to present the Kalman Filter and it's varieties
+ (EKF, UCF) in both it's discrete and continuous form.
+ Since application of Kalman Filters is limited to the discrete space, the
+ note will show how to convert from a continuous system to a discrete system
+ under assumptions and approximations.
+ 
+\end_layout
+
+\begin_layout Section
+Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Kalman-Filter"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Kalman Filter is designed for linear systems: time-varying (LTV) and
+ time-invariant (LTI).
+ Because of their linear nature, the estimators for these systems can be
+ proven to be globally uniformly exponentially stable (GUES).
+ 
+\end_layout
+
+\begin_layout Standard
+This section is outlined as follows: the Discrete Kalman Filter is presented
+ in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Discrete-Kalman-Filter"
+
+\end_inset
+
+, followed by the Continuous Kalman Filter in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-Kalman-Filter"
+
+\end_inset
+
+, and finally the conversion from continuous to discrete in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-to-Discrete"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discrete Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Discrete-Kalman-Filter"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generic discrete linear time-varying (LTV) system can be written in the
+ form
+\begin_inset Formula 
+\begin{eqnarray}
+x_{k} & = & A_{k}x_{k-1}+B_{k}u_{k}+G\mathbf{w}_{k}\label{eq:discrete_system}\\
+y_{k} & = & C_{k}x_{k}+\mathbf{v}_{k}\label{eq:discrete_output}
+\end{eqnarray}
+
+\end_inset
+
+with 
+\begin_inset Formula $x\in\mathbb{\mathbb{R}}^{n}$
+\end_inset
+
+ as the state vector, 
+\begin_inset Formula $u\in\mathbb{R}^{m}$
+\end_inset
+
+ as the input vector, 
+\begin_inset Formula $y\in\mathbb{R}^{s}$
+\end_inset
+
+ as the output vector, 
+\begin_inset Formula $A\in\mathbb{R}^{nxn}$
+\end_inset
+
+ as the system matrix, 
+\begin_inset Formula $B\in\mathbb{R}^{nxm}$
+\end_inset
+
+ as the input matrix and 
+\begin_inset Formula $C\in\mathbb{R}^{sxn}$
+\end_inset
+
+ as the observation matrix.
+ 
+\begin_inset Formula $\mathbf{v}\sim\mathcal{N}\left(0,R\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{w}\sim\mathcal{N}\left(0,Q\right)$
+\end_inset
+
+ are multivariate white noise processes that represent measurement and process
+ noise, and 
+\begin_inset Formula $G$
+\end_inset
+
+ is the constant matrix that defines how the process noise 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ acts on the system.
+ 
+\end_layout
+
+\begin_layout Standard
+The Kalman Filter is a recursive estimator used to estimate the state 
+\begin_inset Formula $x$
+\end_inset
+
+ based off of previous states and measurements.
+ It uses Bayesian inference to maximize the probability of the estimate
+ of 
+\begin_inset Formula $x$
+\end_inset
+
+ given the measurement 
+\begin_inset Formula $y$
+\end_inset
+
+, and it is represented by two variables 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\hat{x}_{k|j}$
+\end_inset
+
+ The expected value, estimate, of 
+\begin_inset Formula $x$
+\end_inset
+
+ at time 
+\begin_inset Formula $k$
+\end_inset
+
+ given measurements up to and including time 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $P_{k|j}$
+\end_inset
+
+ The estimate covariance at time 
+\begin_inset Formula $k$
+\end_inset
+
+ given measurements up to and including time 
+\begin_inset Formula $j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $k>j$
+\end_inset
+
+, the probability of 
+\begin_inset Formula $x_{k|j}$
+\end_inset
+
+,
+\begin_inset Formula $P\left(x\right)$
+\end_inset
+
+, is referred to the prior probability.
+ When a measurement is received, the probability of 
+\begin_inset Formula $y$
+\end_inset
+
+ given 
+\begin_inset Formula $x$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(y|x\right)$
+\end_inset
+
+, is constructed and referred to the likelihood.
+ The objective of the Kalman Filter is to maximize the posterior probability
+ or the probability of 
+\begin_inset Formula $x$
+\end_inset
+
+ given 
+\begin_inset Formula $y$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(y|x\right)$
+\end_inset
+
+, in two phases: a prediction phase and an update phase.
+ 
+\end_layout
+
+\begin_layout Standard
+The prediction phase propagates the state dynamics and the error covariance.
+\begin_inset Formula 
+\begin{eqnarray}
+\hat{x}_{k|j} & = & A_{k}\hat{x}_{k-1|j}+B_{k}u_{k}\label{eq:predict_xhat}\\
+P_{k|j} & = & A_{k}P_{k-1|j}A_{k}^{\top}+GQ_{k}G^{\top}\label{eq:DRE}
+\end{eqnarray}
+
+\end_inset
+
+note that equation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DRE"
+
+\end_inset
+
+is a Discrete Riccati Equation with 
+\begin_inset Formula $P$
+\end_inset
+
+ being positive definite and 
+\begin_inset Formula $Q$
+\end_inset
+
+ semi-positive definite.
+\end_layout
+
+\begin_layout Standard
+The update phase adjusts the state estimate and the estimate covariance
+ to maximize the posterior probability.
+ At the end of this update step 
+\begin_inset Formula $j=k$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{eqnarray}
+K_{k} & = & P_{k}C_{k}^{\top}\left(C_{k}P_{k}C_{k}^{\top}+R_{k}\right)^{-1}\label{eq:kalman_gain}\\
+\hat{x}_{k|k=j} & = & \hat{x}_{k|j}+K_{k}\left(y_{k}-C_{k}\hat{x}_{k|j}\right)\label{eq:xhat_update}\\
+P_{k|j} & = & \left(I-K_{k}C_{k}\right)P_{k|j}\label{eq:estimate_cov_update}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Continuous Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Continuous-Kalman-Filter"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generic continuous linear time-varying (LTV) system can be written in
+ the form
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{x} & = & A\left(t\right)x+B\left(t\right)u+G\mathbf{w}\left(t\right)\label{eq:cont_system}\\
+y & = & C\left(t\right)x+\mathbf{v}\left(t\right)\label{eq:cont_output}
+\end{eqnarray}
+
+\end_inset
+
+where 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont_system"
+
+\end_inset
+
+and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont_output"
+
+\end_inset
+
+are the continuous version of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discrete_system"
+
+\end_inset
+
+and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discrete_output"
+
+\end_inset
+
+.
+ The update phase for the continuous Kalman filter is the same as the discrete
+ Kalman filter, but the prediction phases are different.
+\end_layout
+
+\begin_layout Standard
+The prediction phase for the continuous Kalman filter is
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{\hat{x}}\left(t\right) & = & A\left(t\right)\hat{x}\left(t\right)+B\left(t\right)u\left(t\right)\label{eq:predict_xhat_d}\\
+\Rightarrow\hat{x}_{k|j} & = & \hat{x}\left(t\right)\nonumber \\
+\dot{P}\left(t\right) & = & A\left(t\right)P\left(t\right)+P\left(t\right)A^{\top}\left(t\right)+Q\left(t\right)\label{eq:CRE}\\
+\Rightarrow P_{k|j} & = & P\left(t\right).\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+Applying the continuous Kalman Filter requires numerical integration techniques
+ which can be imprecise, computationally expensive, and, more importantly,
+ cause the error covariance 
+\begin_inset Formula $P\left(t\right)$
+\end_inset
+
+ to leave the positive definite or positive semi-definite manifold due to
+ imprecision in the numerical integration techniques.
+ If 
+\begin_inset Formula $P\left(t\right)$
+\end_inset
+
+, leaves the positive definite or positive semi-definite manifold, it might
+ never recover and all guarantee of stability are lost.
+ In order keep 
+\begin_inset Formula $P\left(t\right)$
+\end_inset
+
+ to stay on it's manifold, the continuous system can be discretized as shown
+ in the next section.
+ 
+\end_layout
+
+\begin_layout Subsection
+Continuous to Discrete Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Continuous-to-Discrete"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section will show how to transform a continuous system of the form
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:CRE"
+
+\end_inset
+
+ to a discrete system of the form 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DRE"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We begin this process by noting that 
+\begin_inset Formula 
+\begin{equation}
+\dot{x}=A\left(t\right)x+B\left(t\right)u+G\left(t\right)\mathbf{w}\left(t\right)
+\end{equation}
+
+\end_inset
+
+has the solution
+\begin_inset Formula 
+\begin{equation}
+x\left(t+\delta\right)=\Phi\left(t+\delta,t\right)x\left(t\right)+\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)B\left(\tau\right)u\left(\tau\right)d\tau+\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\mathbf{w}\left(\tau\right)d\tau\label{eq:non-homogenous_Sol}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\Phi\left(t+\delta,t\right)$
+\end_inset
+
+ is the state transition matrix and defined as
+\begin_inset Formula 
+\begin{align*}
+\Phi\left(t,t_{0}\right) & =I+\int_{t_{0}}^{t}A\left(s_{1}\right)ds_{1}+\int_{t_{0}}^{t}A\left(s_{1}\right)\int_{t_{0}}^{s_{1}}A\left(s_{2}\right)ds_{2}ds_{1}+\\
+ & =\int_{t_{0}}^{t}A\left(s_{1}\right)\int_{t_{0}}^{s_{1}}A\left(s_{2}\right)\int_{t_{0}}^{s_{2}}A\left(s_{2}\right)ds_{3}ds_{2}ds_{1}\ldots.
+\end{align*}
+
+\end_inset
+
+Assume that 
+\begin_inset Formula $\delta$
+\end_inset
+
+ is the time step of the system and that the input 
+\begin_inset Formula $u\left(t\right)$
+\end_inset
+
+ is constant during that time step.
+ Then 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:non-homogenous_Sol"
+
+\end_inset
+
+ can be simplified as
+\begin_inset Formula 
+\[
+x\left(t+\delta\right)=\Phi\left(t+\delta,t\right)x\left(t\right)+\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)B\left(\tau\right)ud\tau+\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(t\right)\mathbf{w}\left(\tau\right)d\tau
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can see that the discrete form of the system matrix 
+\begin_inset Formula $A\left(t\right)$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+A_{k}=\Phi\left(t+\delta,t\right),\label{eq:discreteSystemMatrix}
+\end{equation}
+
+\end_inset
+
+that the discrete form of the input matrix 
+\begin_inset Formula $B\left(t\right)$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+B_{k}=\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)B\left(\tau\right),\label{eq:discreteInputMatrix}
+\end{equation}
+
+\end_inset
+
+and that the discrete form of the noise 
+\begin_inset Formula $\mathbf{w}\left(t\right)$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}_{k}=\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(t\right)\mathbf{w}\left(\tau\right)d\tau.\label{eq:discreteNoise}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The covariance of 
+\begin_inset Formula $\mathbf{w}_{k}$
+\end_inset
+
+can be calculated from the continuous white noise process 
+\begin_inset Formula $\mathbf{w}\left(t\right)$
+\end_inset
+
+.
+ First we note a few properties
+\begin_inset Formula 
+\begin{eqnarray}
+E\left[\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}\left(\alpha\right)\right] & = & Q\left(\tau\right)\delta\left(\tau-\alpha\right)\label{eq:Q_t}\\
+E\left[\mathbf{w}_{k}\mathbf{w}_{k}^{\top}\right] & = & Q_{k}\label{eq:Q_k}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Q_{k}$
+\end_inset
+
+ can now be solved in terms of 
+\begin_inset Formula $Q\left(t\right)$
+\end_inset
+
+ by substituting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discreteNoise"
+
+\end_inset
+
+into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Q_k"
+
+\end_inset
+
+ and using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Q_t"
+
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray}
+Q_{k} & = & E\left[\mathbf{w}_{k}\mathbf{w}_{k}^{\top}\right]\nonumber \\
+ & = & E\left[\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(\tau\right)\mathbf{w}\left(\tau\right)\left(\int_{t}^{t+\delta}\Phi\left(t+\delta,\alpha\right)G\left(\alpha\right)\mathbf{w}\left(\alpha\right)d\alpha\right)^{\top}d\tau\right]\nonumber \\
+ & = & E\left[\int_{t}^{t+\delta}\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(\tau\right)\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}G^{\top}\left(\alpha\right)\Phi\left(t+\delta,\alpha\right)^{\top}d\tau d\alpha\right]\nonumber \\
+ & = & \int_{t}^{t+\delta}\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(\tau\right)E\left[\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}\left(\alpha\right)\right]G^{\top}\left(\alpha\right)\Phi\left(t+\delta,\alpha\right)^{\top}d\tau d\alpha\nonumber \\
+ & = & \int_{t}^{t+\delta}\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(\tau\right)Q\left(\tau\right)\delta\left(\tau-\alpha\right)G^{\top}\left(\alpha\right)\Phi\left(t+\delta,\alpha\right)^{\top}d\tau d\alpha\nonumber \\
+ & = & \int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)G\left(\tau\right)Q\left(\tau\right)G^{\top}\left(\alpha\right)\Phi\left(t+\delta,\tau\right)^{\top}d\tau\label{eq:Qt_to_Qk}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+LTI 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:LTI"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the system is LTI, then we can simplify the discretization problem.
+ I first note that the general from for Linear Time-Invariant (LTI) systems
+ is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{x} & = & Ax\left(t\right)+Bu\left(t\right)+G\mathbf{w}\left(t\right)\label{eq:LTIcont_system}\\
+y & = & Cx\left(t\right)+\mathbf{v}\left(t\right)\label{eq:LTIcont_output}
+\end{eqnarray}
+
+\end_inset
+
+where the matrices 
+\begin_inset Formula $A$
+\end_inset
+
+, 
+\begin_inset Formula $B$
+\end_inset
+
+ and 
+\begin_inset Formula $C$
+\end_inset
+
+ are constant, and the noise covariance matrices 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $R$
+\end_inset
+
+ are also constants.
+ 
+\end_layout
+
+\begin_layout Standard
+For Linear Time-Invariant (LTI) systems, the state transition matrix is
+\begin_inset Formula 
+\begin{eqnarray}
+\Phi\left(t+\delta,t\right) & = & \exp^{A\left(\delta\right)}\label{eq:LTIstateTransitionMatrix}\\
+ & = & \sum_{k=0}^{\infty}\frac{\left(\delta\right)}{k!}A^{k}\nonumber \\
+ & = & \sum_{k=0}^{\infty}\frac{\delta}{k!}A^{k}\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+which can be approximated as 
+\begin_inset Formula 
+\[
+\Phi\left(t,t_{0}\right)\approx I+A\delta+\frac{\left(A\delta\right)^{2}}{2}+\frac{\left(A\delta\right)^{3}}{6}
+\]
+
+\end_inset
+
+using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discreteSystemMatrix"
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align*}
+A_{k} & =\Phi\left(t+\delta,t\right)=\exp^{A\left(\delta\right)}\\
+ & \approx I+A\delta+\frac{\left(A\delta\right)^{2}}{2}+\frac{\left(A\delta\right)^{3}}{6}
+\end{align*}
+
+\end_inset
+
+The discrete input matrix can be simplified to 
+\begin_inset Formula 
+\begin{align*}
+B_{k} & =\int_{t}^{t+\delta}\exp^{A\left(t+\delta-\tau\right)}Bd\tau\\
+ & =A^{-1}\left(\exp^{A\delta}-I\right)B
+\end{align*}
+
+\end_inset
+
+which is not always helpful when 
+\begin_inset Formula $A$
+\end_inset
+
+ is not invertible.
+ In the case that 
+\begin_inset Formula $A$
+\end_inset
+
+ is not invertible, we can approximate it.
+ But first we use 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:LTIstateTransitionMatrix"
+
+\end_inset
+
+ to note that 
+\begin_inset Formula 
+\begin{align*}
+B_{k} & =A^{-1}\left(\exp^{A\delta}-I\right)B\\
+ & =A^{-1}\left(I+A\delta+\frac{A^{2}\delta^{2}}{2}+\cdots+\frac{A^{\infty}\left(\tau\right)^{\infty}}{\infty!}-I\right)B\\
+ & =A^{-1}\left(A\delta+\frac{A^{2}\delta^{2}}{2}+\frac{A^{3}\delta^{3}}{6}+\cdots+\frac{A^{\infty}\left(\tau\right)^{\infty}}{\infty!}\right)B\\
+ & =\left(\delta+\frac{A\delta^{2}}{2}+\frac{A^{2}\delta^{3}}{6}+\cdots+\frac{A^{\infty-1}\left(\tau\right)^{\infty}}{\infty!}\right)B\\
+ & =\left(2I+A\delta+\frac{A^{2}\delta^{2}}{3}+\cdots+\frac{A^{\infty}\left(\tau\right)^{\infty}}{\infty!/2}\right)\frac{\delta}{2}B
+\end{align*}
+
+\end_inset
+
+by ignoring higher order terms, we get
+\begin_inset Formula 
+\[
+B_{k}=\left(2I+A\delta+\frac{A^{2}\delta^{2}}{3}+\frac{A^{3}\delta^{3}}{12}\right)\frac{\delta}{2}B
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we assume that the process noise is constant during the interval 
+\begin_inset Formula $\delta$
+\end_inset
+
+, then 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discreteNoise"
+
+\end_inset
+
+ can be simplified as 
+\begin_inset Formula 
+\begin{align*}
+\mathbf{w}_{k} & =\left(\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)Gd\tau\right)\mathbf{w}\\
+ & =G_{k}\mathbf{w}
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+G_{k}=\int_{t}^{t+\delta}\Phi\left(t+\delta,\tau\right)Gd\tau.
+\]
+
+\end_inset
+
+ In similar manner as the input matrix, the system noise matrix 
+\begin_inset Formula $G_{k}$
+\end_inset
+
+ becomes
+\begin_inset Formula 
+\begin{align*}
+G_{k} & =A^{-1}\left(\exp^{A\delta}-I\right)G\\
+ & \approx\left(2I+A\delta+\frac{A^{2}\delta^{2}}{3}+\frac{A^{3}\delta^{3}}{12}\right)\frac{\delta}{2}G
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The process noise covariance can be simplified by substituting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:LTIstateTransitionMatrix"
+
+\end_inset
+
+ into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Qt_to_Qk"
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+Q_{k}=\int_{t}^{t+\delta}\exp^{A\left(t+\delta-\tau\right)}GQG^{\top}\exp^{A^{\top}\left(t+\delta-\tau\right)}d\tau\label{eq:Qt_to_Qk_LTI}
+\end{equation}
+
+\end_inset
+
+which can be approximated by
+\begin_inset Formula 
+\begin{align*}
+Q_{k} & =\int_{0}^{t+\delta}\exp^{A\Delta t}GQG^{\top}\exp^{A^{\top}\Delta t}d\tau\\
+ & =\int_{t}^{t+\delta}\left(\sum_{k=0}^{\infty}\frac{\Delta t}{k!}A^{k}\right)GQG^{\top}\left(\sum_{k=0}^{\infty}\frac{\Delta t}{k!}A^{k}\right)d\tau\\
+ & =\int_{t}^{t+\delta}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\cdots+\frac{A^{\infty}\left(\Delta t\right)^{\infty}}{\infty!}\right)GQG^{\top}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\cdots+\frac{A^{\infty}\left(\Delta t\right)^{\infty}}{\infty!}\right)^{\top}d\tau\\
+ & \approx\int_{t}^{t+\delta}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}\right)GQG^{\top}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}\right)^{\top}d\tau
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Delta t=t+\delta-\tau$
+\end_inset
+
+.
+ Removing higher order terms we get
+\begin_inset Formula 
+\[
+Q_{k}\approx\int_{t}^{t+\delta}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}\right)GQG^{\top}\left(I+A\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}\right)^{\top}d\tau
+\]
+
+\end_inset
+
+expanding the equation we get
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx\int_{t}^{t+\delta}(IHI+IHA^{\top}\Delta t+\frac{IHA^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{IHA^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++A\Delta tHI+A\Delta tHA^{\top}\Delta t+\frac{A\Delta tHA^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A\Delta tHA^{\top^{3}}\left(\Delta t\right)^{3}}{6}\\
++\frac{A^{2}\left(\Delta t\right)^{2}HI}{2}+\frac{A^{2}\left(\Delta t\right)^{2}HA^{\top}\Delta t}{2}+\frac{A^{2}\left(\Delta t\right)^{2}}{2}H\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{2}\left(\Delta t\right)^{2}}{2}H\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{6}\\
++\frac{A^{3}\left(\Delta t\right)^{3}HI}{6}+\frac{A^{3}\left(\Delta t\right)^{3}HA^{\top}\tau}{6}+\frac{A^{3}\left(\Delta t\right)^{3}}{6}H\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{6}H\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{6})d\tau
+\end{multline*}
+
+\end_inset
+
+where 
+\begin_inset Formula $H=GQG^{\top}$
+\end_inset
+
+ .Removing higher order terms we get
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx\int_{t}^{t+\delta}(H+HA^{\top}\Delta t+\frac{HA^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{HA^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++AH\Delta t+AHA^{\top}\Delta t^{2}+\frac{AHA^{\top^{2}}\left(\Delta t\right)^{3}}{2}\\
++\frac{A^{2}\left(\Delta t\right)^{2}H}{2}+\frac{A^{2}HA^{\top}\Delta t^{3}}{2}+\frac{A^{3}H\left(\Delta t\right)^{3}}{6})d\tau
+\end{multline*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which is integrated 
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx H\delta+\frac{HA^{\top}\delta^{2}}{2}+\frac{HA^{\top^{2}}\left(\delta\right)^{3}}{6}+\frac{HA^{\top^{3}}\left(\delta\right)^{4}}{8}\\
++\frac{AH\delta^{2}}{2}+\frac{AHA^{\top}\delta^{3}}{3}+\frac{AHA^{\top^{2}}\left(\delta\right)^{4}}{8}\\
++\frac{A^{2}\left(\delta\right)^{3}H}{6}+\frac{A^{2}HA^{\top}\delta^{4}}{8}+\frac{A^{3}H\left(\delta\right)^{4}}{24}
+\end{multline*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In summary, we made the assumptions that the input 
+\begin_inset Formula $u\left(t\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{w}\left(t\right)$
+\end_inset
+
+ are constant over the time interval 
+\begin_inset Formula $\delta$
+\end_inset
+
+ in order to convert the continuous system to a discrete system.
+ The end result is a system 
+\begin_inset Formula 
+\begin{eqnarray}
+x_{k} & = & A_{k}x_{k-1}+B_{k}u_{k}+G\mathbf{w}_{k}\label{eq:discrete_system-1}\\
+y_{k} & = & C_{k}x+\mathbf{v}_{k}\label{eq:discrete_output-1}
+\end{eqnarray}
+
+\end_inset
+
+with prediction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\hat{x}_{k|j} & = & A_{k}\hat{x}_{k-1|j}+B_{k}u_{k}\\
+P_{k|j} & = & A_{k}P_{k-1|j}A_{k}^{\top}+Q_{k}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and update
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+K_{k} & = & P_{k}C_{k}^{\top}\left(C_{k}P_{k}C_{k}^{\top}+R_{k}\right)^{-1}\\
+\hat{x}_{k|k=j} & = & \hat{x}_{k|j}+K_{k}\left(y_{k}-C_{k}\hat{x}_{k|j}\right)\\
+P_{k|j} & = & \left(I-K_{k}C_{k}\right)P_{k|j}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+A_{k}=\exp^{A\delta}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+B_{k}=A^{-1}\left(\exp^{A\delta}-I\right)B
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+G_{k}=A^{-1}\left(\exp^{A\delta}-I\right)G
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+Q_{k}=\int_{t}^{t+\delta}\exp^{A\left(t+\delta-\tau\right)}GQG^{\top}\exp^{A^{\top}\left(t+\delta-\tau\right)}d\tau
+\]
+
+\end_inset
+
+which can be approximated as
+\begin_inset Formula 
+\[
+A_{k}\approx I+A\delta+\frac{\left(A\delta\right)^{2}}{2}+\frac{\left(A\delta\right)^{3}}{6}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+B_{k}\approx\left(2I+A\delta+\frac{A^{2}\delta^{2}}{3}+\frac{A^{3}\delta^{3}}{12}\right)\frac{\delta}{2}B
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+G_{k}\approx\left(2I+A\delta+\frac{A^{2}\delta^{2}}{3}+\frac{A^{3}\delta^{3}}{12}\right)\frac{\delta}{2}G
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx H\delta+\frac{HA^{\top}\delta^{2}}{2}+\frac{HA^{\top^{2}}\left(\delta\right)^{3}}{6}+\frac{HA^{\top^{3}}\left(\delta\right)^{4}}{8}+\frac{AH\delta^{2}}{2}\\
++\frac{AHA^{\top}\delta^{3}}{3}+\frac{A^{2}H\left(\delta\right)^{3}}{6}+\frac{AHA^{\top^{2}}\left(\delta\right)^{4}}{8}+\frac{A^{2}HA^{\top}\delta^{4}}{8}+\frac{A^{3}H\left(\delta\right)^{4}}{24}
+\end{multline*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $Q_{k}=G_{k}QG_{k}^{\top}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+LTV 
+\end_layout
+
+\begin_layout Standard
+Similar approximations can be done for LTV systems as are done for LTI systems
+ with the assumption that 
+\begin_inset Formula $A\left(t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $B\left(t\right)$
+\end_inset
+
+, and 
+\begin_inset Formula $G\left(t\right)$
+\end_inset
+
+ are constant during the time interval 
+\begin_inset Formula $\delta$
+\end_inset
+
+.
+ Under this assumption, the LTV system becomes LTI during each time step
+ and you can implement the Kalman Filter as done in sub-subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:LTI"
+
+\end_inset
+
+.
+ In other words 
+\begin_inset Formula $A=A\left(t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $B=B\left(t\right)$
+\end_inset
+
+, and 
+\begin_inset Formula $G=G\left(t\right)$
+\end_inset
+
+ at each time step.
+ This method might not be any more computationally efficient then numerical
+ integration, but it will guarantee that 
+\begin_inset Formula $P\left(t\right)$
+\end_inset
+
+ stays on the positive definite or positive semi-definite manifold.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Note on Approximations
+\end_layout
+
+\begin_layout Standard
+In some applications, the time step may vary or the system matrix 
+\begin_inset Formula $A$
+\end_inset
+
+ might not be invertible.
+ In these cases, it is good to use the approximations when it is demanded
+ by either 
+\begin_inset Formula $A$
+\end_inset
+
+ being singular or for computational needs.
+ Also, in some systems, higher orders of 
+\begin_inset Formula $A$
+\end_inset
+
+ may be zero.
+ In these cases, you can calculate the true values using approximation methods.
+\end_layout
+
+\begin_layout Section
+Extended Kalman Filter
+\end_layout
+
+\begin_layout Standard
+The Extended Kalman Filter (EKF) was designed to extend the Kalman Filter
+ method to nonlinear systems.
+ It has proven itself to be valuable and widely used.
+ However, the stability properties of the EKF can only be proven locally
+ and not globally due to the nature of the filter.
+ This implies that the EKF cannot be proven to be robust to large errors
+ in the initialization of the estimate state and the error, process, and
+ measurement covariances.
+ It also assumes that the true noise covariances are small relative to how
+ nonlinear the system is.
+ 
+\end_layout
+
+\begin_layout Standard
+This section is outlined as follows: the Discrete Extended Kalman Filter
+ is presented in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Discrete-Extended-Kalman"
+
+\end_inset
+
+, followed by the Continuous Extended Kalman Filter in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-Extended-Kalman"
+
+\end_inset
+
+, and finally the conversion from continuous to discrete in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-to-Discrete-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discrete Extended Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Discrete-Extended-Kalman"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generic discrete non-linear system can be written in the form
+\begin_inset Formula 
+\begin{align}
+x_{k} & =f\left(x_{k-1},u_{k},\mathbf{w}_{k}\right)\\
+y_{k} & =h\left(x_{k}\right)+\mathbf{v}_{k}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $f\left(x_{k-1},u_{k}\right)$
+\end_inset
+
+ is the system function describing how the previous state 
+\begin_inset Formula $x_{k-1}$
+\end_inset
+
+, current input 
+\begin_inset Formula $u_{k}$
+\end_inset
+
+, and process noise 
+\begin_inset Formula $\mathbf{V}_{k}$
+\end_inset
+
+ affect the current state 
+\begin_inset Formula $x_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $h\left(x_{k}\right)$
+\end_inset
+
+ is the observation function, and 
+\begin_inset Formula $\mathbf{v}_{k}$
+\end_inset
+
+ is the measurement noise.
+ As before 
+\begin_inset Formula $\mathbf{w}\sim\mathcal{N}\left(0,Q\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}\sim\mathcal{N}\left(0,R\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula 
+\begin{align}
+A_{k} & =\left.\frac{\partial f\left(\hat{x}_{k-1},u_{k},\mathbf{w}_{k}\right)}{\partial\hat{x}_{k-1}}\right|_{\hat{x}_{k-1},u_{k},\mathbf{w}_{k}}\\
+G_{k} & =\left.\frac{\partial f\left(\hat{x}_{k-1},u_{k},\mathbf{w}_{k}\right)}{\partial\mathbf{W}_{k}}\right|_{\hat{x}_{k-1},u_{k},\mathbf{w}_{k}}\\
+C_{k} & =\left.\frac{\partial h\left(\hat{x}_{k}\right)}{\partial\hat{x}_{k}}\right|_{\hat{x}_{k-1}}
+\end{align}
+
+\end_inset
+
+Then the EKF prediction step is
+\begin_inset Formula 
+\begin{align}
+\hat{x}_{k|j} & =f\left(\hat{x}_{k-1|j},u_{k},\mathbf{w}_{k}\right)\\
+P_{k|j} & =A_{k}P_{k-1|j}A_{k}^{\top}+G_{k}QG_{k}^{\top}
+\end{align}
+
+\end_inset
+
+and update phase is 
+\begin_inset Formula 
+\begin{align}
+K_{k} & =P_{k|j}C_{k}^{\top}\left(C_{k}P_{k|j}C_{k}^{\top}+R_{k}\right)^{-1}\\
+\hat{x}_{k|k} & =\hat{x}_{k|j}+K_{k}\left(y_{k}-h\left(\hat{x}_{k|j}\right)\right)\\
+P_{k|k} & =\left(I-K_{k}C_{k}\right)P_{k|j}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Continuous Extended Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Continuous-Extended-Kalman"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generic continuous non-linear system can be written in the form
+\begin_inset Formula 
+\begin{align}
+\dot{x}\left(t\right) & =f\left(x\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)\right)\\
+y\left(t\right) & =h\left(x\left(t\right)\right)+\mathbf{v}\left(t\right)
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $f\left(x\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)\right)$
+\end_inset
+
+ is the system function describing how the current state 
+\begin_inset Formula $x\left(t\right)$
+\end_inset
+
+, current input 
+\begin_inset Formula $u\left(t\right)$
+\end_inset
+
+, and process noise 
+\begin_inset Formula $\mathbf{V}\left(t\right)$
+\end_inset
+
+ affect the current state derivative 
+\begin_inset Formula $x\left(t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $h\left(x\left(t\right)\right)$
+\end_inset
+
+ is the observation function, and 
+\begin_inset Formula $\mathbf{v}\left(t\right)$
+\end_inset
+
+ is the measurement noise.
+ As before 
+\begin_inset Formula $\mathbf{w}\sim\mathcal{N}\left(0,Q\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}\sim\mathcal{N}\left(0,R\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula 
+\begin{align}
+A\left(t\right) & =\left.\frac{\partial f\left(\hat{x}\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)\right)}{\partial\hat{x}\left(t\right)}\right|_{\hat{x}\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)}\\
+G\left(t\right) & =\left.\frac{\partial f\left(\hat{x}\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)\right)}{\partial\mathbf{w}\left(t\right)}\right|_{\hat{x}\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)}\\
+C\left(t\right) & =\left.\frac{\partial h\left(\hat{x}\left(t\right)\right)}{\partial\hat{x}\left(t\right)}\right|_{\hat{x}\left(t\right)}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then the EKF prediction step is
+\begin_inset Formula 
+\begin{align}
+\dot{\hat{x}}\left(t|j\right) & =f\left(\hat{x}\left(t|j\right),u\left(t\right),\mathbf{w}\left(t\right)\right)\\
+\dot{P}\left(t|j\right) & =A\left(t\right)P\left(t-\delta|j\right)+P\left(t-\delta|j\right)A^{\top}\left(t\right)+G\left(t\right)QG^{\top}\left(t\right)
+\end{align}
+
+\end_inset
+
+and update phase is 
+\begin_inset Formula 
+\begin{align}
+K & =P\left(t|j\right)C^{\top}\left(t\right)\left(C\left(t\right)P\left(t|j\right)C^{\top}\left(t\right)+R\left(t\right)\right)^{-1}\\
+\hat{x}\left(t|t\right) & =\hat{x}\left(t|j\right)+K\left(y\left(t\right)-h\left(\hat{x}\left(t|j\right)\right)\right)\\
+P\left(t|t\right) & =\left(I-KC\left(t\right)\right)P\left(t|j\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Continuous to Discrete Extended Kalman Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Continuous-to-Discrete-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This subsection is more appropriately named Hybrid Extended Kalman Filter
+ since I will discuss how to discretize only the continuous error covariance
+ prediction step.
+ The continuous error covariance prediction step is 
+\begin_inset Formula 
+\begin{equation}
+\dot{P}\left(t|j\right)=A\left(t\right)P\left(t-\delta|j\right)+P\left(t-\delta|j\right)A^{\top}\left(t\right)+G\left(t\right)QG^{\top}\left(t\right)
+\end{equation}
+
+\end_inset
+
+as shown in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-Extended-Kalman"
+
+\end_inset
+
+.
+ It's non-homogenous solution is 
+\begin_inset Formula 
+\begin{equation}
+P\left(t|j\right)=\Phi\left(t,t-\delta\right)P\left(t-\delta|j\right)\Phi^{\top}\left(t,t,t-\delta\right)+\int_{t,t-\delta}^{t}\Phi\left(t,\tau-\delta\right)G\left(\tau\right)QG^{\top}\left(\tau\right)\Phi^{\top}\left(t,\tau-\delta\right)d\tau
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Phi\left(t,t-\delta\right)$
+\end_inset
+
+ is the state transition matrix of 
+\begin_inset Formula $A\left(t\right)$
+\end_inset
+
+.
+ Subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Continuous-to-Discrete"
+
+\end_inset
+
+ shows how to calculate 
+\begin_inset Formula 
+\begin{align*}
+A_{k} & =\Phi\left(t,t-\delta\right)\\
+G_{k} & =\int_{t,t-\delta}^{t}\Phi\left(t,\tau-\delta\right)G\left(\tau\right)d\tau
+\end{align*}
+
+\end_inset
+
+Using these values we get that the prediction step is 
+\begin_inset Formula 
+\begin{align}
+\dot{\hat{x}}\left(t|j\right) & =f\left(\hat{x}\left(t|j\right),u\left(t\right),\mathbf{w}\left(t\right)\right)\\
+P_{k|j} & =A_{k}P_{k-1|j}A_{k}^{\top}+G_{k}QG_{k}^{\top}
+\end{align}
+
+\end_inset
+
+and update step 
+\begin_inset Formula 
+\begin{align}
+K & =P_{k|j}C\left(t\right)\left(C\left(t\right)P_{k|j}C^{\top}\left(t\right)+R\left(t\right)\right)^{-1}\\
+\hat{x}\left(t|t\right) & =\hat{x}\left(t|j\right)+K\left(y\left(t\right)-h\left(\hat{x}\left(t|j\right)\right)\right)\\
+P\left(t|t\right) & =\left(I-KC\left(t\right)\right)P_{k|j}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Unscented Kalman Filter
+\end_layout
+
+\begin_layout Standard
+The Unscented Kalman Filter (UKF) is similar to the EKF in the sense that
+ it is used for nonlinear systems.
+ By design, the UKF is able to estimate the noise covariance better at computati
+onal cost.
+ The degree to which the estimate is better depends on how large the covariance
+ of the measurement and process noise are.
+ 
+\end_layout
+
+\begin_layout Standard
+In this section I will present the Discrete UKF in subsection 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sub:Discrete-UKF"
+
+\end_inset
+
+, and dive a little into Sigma Points in subsection 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sub:Understanding-Sigma-Points"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Discrete UKF
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Discrete-UKF"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+after "3.4"
+key "Thrun2006"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A generic discrete non-linear system can be written in the form
+\begin_inset Formula 
+\begin{align}
+x_{k} & =f\left(x_{k-1},u_{k},\mathbf{w}_{k}\right)\\
+y_{k} & =h\left(x_{k}\right)+\mathbf{v}_{k}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $f\left(x\left(t\right),u\left(t\right),\mathbf{w}\left(t\right)\right)$
+\end_inset
+
+ is the system function describing how the current state 
+\begin_inset Formula $x\left(t\right)\in\mathbb{R}^{n}$
+\end_inset
+
+, current input 
+\begin_inset Formula $u\left(t\right)$
+\end_inset
+
+, and process noise 
+\begin_inset Formula $\mathbf{V}\left(t\right)$
+\end_inset
+
+ affect the current state derivative 
+\begin_inset Formula $x\left(t\right)$
+\end_inset
+
+, 
+\begin_inset Formula $h\left(x\left(t\right)\right)$
+\end_inset
+
+ is the observation function, and 
+\begin_inset Formula $\mathbf{v}\left(t\right)$
+\end_inset
+
+ is the measurement noise.
+ As before 
+\begin_inset Formula $\mathbf{w}\sim\mathcal{N}\left(0,Q\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}\sim\mathcal{N}\left(0,R\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The estimated system can be written as 
+\begin_inset Formula 
+\begin{align}
+\hat{x}_{k} & =f\left(\hat{x}_{k-1},u_{k},\mathbf{w}_{k}\right)\\
+\hat{y}_{k} & =h\left(\hat{x}_{k}\right)+\mathbf{v}_{k}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{x}$
+\end_inset
+
+ is the estimate of the state vector 
+\begin_inset Formula $x$
+\end_inset
+
+, and is the mean of 
+\begin_inset Formula $p\left(x\right)\sim\mathcal{N}\left(\hat{x},P\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $P$
+\end_inset
+
+ is the error covariance.
+ 
+\end_layout
+
+\begin_layout Standard
+Before presenting the algorithm, we will define several terms.
+ 
+\begin_inset Formula $\chi\in\mathbb{R}^{n\times2n+1}$
+\end_inset
+
+ is a container that contains 
+\begin_inset Formula $2n+1$
+\end_inset
+
+ sigma points.
+ Sigma points are samples of the PDF, 
+\begin_inset Formula $p\left(x\right)$
+\end_inset
+
+, where one sample is at the mean and 
+\begin_inset Formula $2n$
+\end_inset
+
+ samples are around one standard deviation.
+ See subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Understanding-Sigma-Points"
+
+\end_inset
+
+ for more information about sigma points.
+ The container 
+\begin_inset Formula $\chi$
+\end_inset
+
+ is filled as such
+\begin_inset Formula 
+\begin{align*}
+\chi^{\left[0\right]} & =\hat{x}\\
+\chi^{\left[i\right]} & =\hat{x}+\left(\sqrt{\left(n+\lambda\right)P}\right)_{i},\quad\text{for}i=1,\ldots,n\\
+\chi^{\left[i\right]} & =\hat{x}-\left(\sqrt{\left(n+\lambda\right)P}\right)_{i},\quad\text{for}i=n+1,\ldots,2n
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\chi^{\left[i\right]}$
+\end_inset
+
+ denotes the 
+\begin_inset Formula $i$
+\end_inset
+
+th column of the container 
+\begin_inset Formula $\chi$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(\sqrt{\left(n+\lambda\right)P}\right)_{i}$
+\end_inset
+
+ denotes the 
+\begin_inset Formula $i$
+\end_inset
+
+th column of the matrix 
+\begin_inset Formula $\left(\sqrt{\left(n+\lambda\right)P}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $n$
+\end_inset
+
+ is the dimension of 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ The vectors 
+\begin_inset Formula $\chi^{\left[i\right]}$
+\end_inset
+
+ are samples of the distribution at the mean and around one standard deviation.
+ The term 
+\begin_inset Formula $n+\lambda$
+\end_inset
+
+ determines how far the sample is from the standard deviation.
+ Here 
+\begin_inset Formula $\lambda=\alpha^{2}\left(n+\kappa\right)-n$
+\end_inset
+
+, where 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is a scalar usually 
+\begin_inset Formula $1e^{-3}$
+\end_inset
+
+ and 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is a scalar value usually 
+\begin_inset Formula $0$
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Cai2006"
+
+\end_inset
+
+.
+ However, according to 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Julier1997"
+
+\end_inset
+
+, setting 
+\begin_inset Formula $n+\lambda=3$
+\end_inset
+
+ is preferred.
+\end_layout
+
+\begin_layout Standard
+Once the container 
+\begin_inset Formula $\chi$
+\end_inset
+
+ is filled, each sample point 
+\begin_inset Formula $\chi^{\left[i\right]}$
+\end_inset
+
+ is propagated through the nonlinear function 
+\begin_inset Formula $f$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+\bar{\chi}^{\left[i\right]}=f\left(\chi^{\left[i\right]},u_{k}\right)
+\end{equation}
+
+\end_inset
+
+which I will refer to as the posterior sigma points.
+ A new mean and variance is calculated from the posterior sigma points according
+ to 
+\begin_inset Formula 
+\begin{align}
+\bar{\mu} & =\sum_{i=0}^{2n+1}\omega_{m}^{\left[i\right]}\bar{\chi}^{\left[i\right]}\\
+\bar{P} & =\sum_{i=0}^{2n+1}\omega_{c}^{\left[i\right]}\left(\bar{\chi}^{\left[i\right]}-\bar{\mu}\right)\left(\bar{\chi}^{\left[i\right]}-\bar{\mu}\right)^{\top}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\omega_{c}^{\left[i\right]}$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega_{m}^{\left[i\right]}$
+\end_inset
+
+ are weights defined as 
+\begin_inset Formula 
+\begin{align}
+\omega_{m}^{\left[0\right]} & =\frac{1}{n+\lambda}\\
+\omega_{c}^{\left[0\right]} & =\frac{\lambda}{n+\lambda}+\left(1-\alpha^{2}+\beta\right)\\
+\omega_{c}^{\left[i\right]}=\omega_{m}^{\left[i\right]} & =\frac{1}{2\left(2+\lambda\right)}\quad\text{for}\,i=1,\ldots,2n
+\end{align}
+
+\end_inset
+
+such that 
+\begin_inset Formula $\sum_{i=0}^{2n+1}\omega_{m}^{\left[i\right]}=1$
+\end_inset
+
+, and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is a constant that encodes additional higher information about the distribution
+ underlying the Gaussian representation.
+ If the underlying distribution is Gaussian, then 
+\begin_inset Formula $\beta=2$
+\end_inset
+
+ would be the optimal choice
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Cai2006,Thrun2006"
+
+\end_inset
+
+.
+ See subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Understanding-the-Weights"
+
+\end_inset
+
+ for an explanation about the weights used.
+ 
+\end_layout
+
+\begin_layout Standard
+The same process is repeated for the measurements.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+wide false
+sideways false
+status open
+
+\begin_layout Enumerate
+\begin_inset Formula $\chi^{\left[i\right]}=\left[\hat{x},\quad\hat{x}+\left(\sqrt{\left(n+\lambda\right)P}\right)_{i},\quad\text{for}i=1,\ldots,n,\quad\hat{x}-\left(\sqrt{\left(n+\lambda\right)P}\right)_{i},\quad\text{for}i=n+1,\ldots,2n\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\bar{\chi}^{\left[i\right]}=f\left(\chi^{\left[i\right]},u_{k}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\bar{\mu}=\sum_{i=0}^{2n+1}\omega_{m}^{\left[i\right]}\bar{\chi}^{\left[i\right]}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\bar{P}=\sum_{i=0}^{2n+1}\omega_{c}^{\left[i\right]}\left(\bar{\chi}^{\left[i\right]}-\bar{\mu}\right)\left(\bar{\chi}^{\left[i\right]}-\bar{\mu}\right)^{\top}+Q$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+For Each Measurement
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $\chi_{*}^{\left[i\right]}=\left[\bar{\mu},\quad\bar{\mu}+\left(\sqrt{\left(n+\lambda\right)\bar{P}}\right)_{i},\quad\text{for}i=1,\ldots,n,\quad\bar{\mu}-\left(\sqrt{\left(n+\lambda\right)\bar{P}}\right)_{i},\quad\text{for}i=n+1,\ldots,2n\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\bar{y}^{\left[i\right]}=g\left(\chi_{*}^{\left[i\right]},\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{y}=\sum_{i=0}^{2n+1}\omega_{m}^{\left[i\right]}\bar{\chi_{*}}^{\left[i\right]}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $S=\sum_{i=0}^{2n+1}\omega_{c}^{\left[i\right]}\left(\bar{y}^{\left[i\right]}-\hat{y}\right)\left(\bar{y}^{\left[i\right]}-\hat{y}\right)^{\top}+R$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\bar{P}_{*}=\sum_{i=0}^{2n+1}\omega_{c}^{\left[i\right]}\left(\bar{\chi}^{\left[i\right]}-\bar{\mu}\right)\left(\bar{y}^{\left[i\right]}-\hat{y}\right)^{\top}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $K=\bar{P}_{*}S^{-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\hat{x}=\hat{x}+K\left(y-\hat{y}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $P=\bar{P}_{*}-KSK^{\top}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+UKF
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Understanding Sigma Points 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Understanding-Sigma-Points"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A Gaussian probability density function (PDF) is
+\begin_inset Formula 
+\begin{equation}
+\frac{1}{\sqrt{2\pi\det\left(R\right)}}\exp\left(-\frac{1}{2}\left(x-\mu\right)^{\top}R^{-1}\left(x-\mu\right)\right)
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $x\in\mathbb{R}^{n}$
+\end_inset
+
+ is the sample from the distribution, 
+\begin_inset Formula $R\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ is the covariance and is positive definite, and 
+\begin_inset Formula $\mu\in\mathbb{R}^{n}$
+\end_inset
+
+ is the mean of the distribution.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $x$
+\end_inset
+
+ is one standard deviation from the mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+, then 
+\begin_inset Formula 
+\begin{equation}
+\left(x-\mu\right)^{\top}R^{-1}\left(x-\mu\right)=1
+\end{equation}
+
+\end_inset
+
+We want to find out what 
+\begin_inset Formula $x$
+\end_inset
+
+ needs to be in order to be one standard deviation from the mean.
+ In order to do this, we note that if 
+\begin_inset Formula 
+\begin{equation}
+A^{\top}R^{-1}A=I\label{eq:UKF_std_ID}
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $A\in\mathbb{R}^{n\times n}$
+\end_inset
+
+, then each column of 
+\begin_inset Formula $A$
+\end_inset
+
+, denoted as 
+\begin_inset Formula $A_{i},\:i=1,\cdots,n$
+\end_inset
+
+, satisfies 
+\begin_inset Formula 
+\begin{equation}
+A_{i}^{\top}R^{-1}A_{i}=1
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $x=\mu+A_{i}$
+\end_inset
+
+ so that 
+\begin_inset Formula $x$
+\end_inset
+
+ is one standard deviation from 
+\begin_inset Formula $\mu$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+One method is the Cholesky factorization.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Moon2000"
+
+\end_inset
+
+ The Cholesky factorization can factor any Hermitian matrix into a product
+ of an upper and lower triangular matrix, i.e.
+\begin_inset Formula 
+\begin{equation}
+L_{L}L^{U}=A
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $L_{L}$
+\end_inset
+
+ is the transpose of 
+\begin_inset Formula $L^{U}$
+\end_inset
+
+; 
+\begin_inset Formula $L_{L}=L^{U^{\top}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let the Cholesky factorization of 
+\begin_inset Formula $R$
+\end_inset
+
+ be 
+\begin_inset Formula $R=L_{L}L^{U}$
+\end_inset
+
+, then 
+\begin_inset Formula 
+\begin{align}
+RR^{-1} & =I\\
+L_{L}L^{U}R^{-1} & =I
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+multiply both sides on the left by the inverse of 
+\begin_inset Formula $L_{L}$
+\end_inset
+
+ yields
+\begin_inset Formula 
+\begin{equation}
+L^{U}R^{-1}=L_{L}^{-1}
+\end{equation}
+
+\end_inset
+
+and multiplying both side on the right by 
+\begin_inset Formula $L_{L}$
+\end_inset
+
+ yields
+\begin_inset Formula 
+\begin{align}
+L^{U}R^{-1}L_{L} & =I\\
+L_{L}^{\top}R^{-1}L_{L} & =I
+\end{align}
+
+\end_inset
+
+which is in the form of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UKF_std_ID"
+
+\end_inset
+
+.
+ Thus every column of 
+\begin_inset Formula $L_{L}$
+\end_inset
+
+ represents one standard deviation and so for 
+\begin_inset Formula $x$
+\end_inset
+
+ to be one standard deviation from the mean,
+\begin_inset Formula 
+\begin{equation}
+x=L_{L_{i}}+\mu,\quad i=1,\cdots,n.
+\end{equation}
+
+\end_inset
+
+but wouldn't it be nice if 
+\begin_inset Formula $x$
+\end_inset
+
+ was sampled along the eigenvectors of the PDF to get a better representation
+ of the distribution? No! According to 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Julier1997"
+
+\end_inset
+
+, the sigma points capture the same mean and covariance irrespective of
+ the choice of matrix square root which is used.
+ But for being complete, I will show the eigenvalue decomposition method.
+ 
+\end_layout
+
+\begin_layout Standard
+Another method is to use the eigenvalue decomposition to get samples of
+ 
+\begin_inset Formula $x$
+\end_inset
+
+ that are one standard deviation away from the mean and along the eigenvectors
+ of the PDF.
+ Since 
+\begin_inset Formula $R$
+\end_inset
+
+ is positive semi-definite (p.s.d.), then the eigenvalue decomposition is 
+\begin_inset Formula 
+\begin{equation}
+R=Q\Lambda Q^{\top}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $Q\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ is an orthonormal matrix whose columns are composed of the eigenvectors
+ of 
+\begin_inset Formula $R$
+\end_inset
+
+, and 
+\begin_inset Formula $\Lambda\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ is a diagonal matrix containing the eigenvalues of 
+\begin_inset Formula $R$
+\end_inset
+
+.
+ We note also that 
+\begin_inset Formula $R^{-1}=Q\Lambda^{-1}Q^{\top}$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $A=Q\sqrt{\Lambda}$
+\end_inset
+
+ where 
+\begin_inset Formula $\sqrt{\Lambda}$
+\end_inset
+
+ is the square root of the diagonal terms, then 
+\begin_inset Formula 
+\begin{align}
+A^{\top}R^{-1}A & =\sqrt{\Lambda}Q^{\top}Q\Lambda^{-1}Q^{\top}Q\sqrt{\Lambda}
+\end{align}
+
+\end_inset
+
+noting that 
+\begin_inset Formula $Q^{\top}Q=I$
+\end_inset
+
+ since an orthonormal matrix is unitary
+\begin_inset Formula 
+\begin{align}
+A^{\top}R^{-1}A & =\sqrt{\Lambda}\Lambda^{-1}\sqrt{\Lambda}\\
+ & =I
+\end{align}
+
+\end_inset
+
+which satisfies the constraint 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:UKF_std_ID"
+
+\end_inset
+
+.
+ Thus every column of 
+\begin_inset Formula $Q\sqrt{\Lambda}$
+\end_inset
+
+ represents represents one standard deviation and so for 
+\begin_inset Formula $x$
+\end_inset
+
+ to be one standard deviation from the mean,
+\begin_inset Formula 
+\begin{equation}
+x=q_{i}\sqrt{\lambda_{i}}+\mu,\quad i=1,\cdots,n.
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $q_{i}$
+\end_inset
+
+ is the 
+\begin_inset Formula $i$
+\end_inset
+
+th column of 
+\begin_inset Formula $Q$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+ is the 
+\begin_inset Formula $i$
+\end_inset
+
+th diagonal term of 
+\begin_inset Formula $\Lambda$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $R$
+\end_inset
+
+ is a diagonal matrix, then there is not difference between the eigenvalue
+ decomposition method and the Cholesky factorization.
+ 
+\end_layout
+
+\begin_layout Subsection
+Understanding the Weights 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Understanding-the-Weights"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Coming eventually.
+ Just maybe.
+ For now I defer to 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Julier1996"
+
+\end_inset
+
+.
+ Basically I don't understand it well enough to explain it here.
+\end_layout
+
+\begin_layout Section
+Multiple Measurement Sources
+\end_layout
+
+\begin_layout Standard
+There are several different techniques for implementing a Kalman Filter
+ with multiple measurement sources.
+ These techniques can be easily extended to the EKF and UKF using the techniques
+ presented in the previous sections.
+ In this section, we will discuss 
+\end_layout
+
+\begin_layout Subsection
+Group Sensor Method
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Group-Sensor-Method"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Group Sensor Method assumes that 
+\begin_inset Formula $S$
+\end_inset
+
+ observations are made synchronously, and each observation corresponds to
+ an output of the form
+\begin_inset Formula 
+\[
+y_{s}\left(t\right)=C_{s}x\left(t\right)+\mathbf{v}_{s}\left(t\right),\quad s=1,\cdots,S.
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $y_{s}\in\mathbb{R}^{m}$
+\end_inset
+
+ is the observation at time 
+\begin_inset Formula $t$
+\end_inset
+
+ from the observation/sensor 
+\begin_inset Formula $s$
+\end_inset
+
+, 
+\begin_inset Formula $x\left(t\right)\in\mathbb{R}^{n}$
+\end_inset
+
+ is the state vector, 
+\begin_inset Formula $C_{s}$
+\end_inset
+
+ is the observation model for sensor 
+\begin_inset Formula $s$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{v}_{s}\sim\mathcal{N}\left(0,R_{s}\right)$
+\end_inset
+
+ is the noise associated with sensor 
+\begin_inset Formula $s$
+\end_inset
+
+.
+ The noise 
+\begin_inset Formula $\mathbf{v}_{s}$
+\end_inset
+
+ is assumed to be uncorrelated between sensors and also time uncorrelated.
+ 
+\end_layout
+
+\begin_layout Standard
+We now combine all observations and observation models into a single composite
+ group sensor
+\begin_inset Formula 
+\begin{align}
+y_{g}\left(t\right) & \triangleq\left[y_{1}^{\top}\left(t\right),\cdots,y_{S}^{\top}\left(t\right)\right]^{\top}\in\mathbb{R}^{Sm}\\
+C_{g}\left(t\right) & \triangleq\left[C_{1}^{\top}\left(t\right),\cdots C_{S}^{\top}\left(t\right)\right]^{\top}\in\mathbb{R}^{Sm\times n}\\
+\mathbf{v}_{g}\left(t\right) & \triangleq\left[\mathbf{v}_{1}^{\top}\left(t\right),\cdots,\mathbf{v}_{S}^{\top}\left(t\right)\right]^{\top}\in\mathbb{R}^{Sm}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{align}
+R_{g} & =E\left\{ \mathbf{v}_{g}\left(t\right)\mathbf{v}_{g}^{\top}\left(t\right)\right\} \\
+ & =\text{blockdiag}\left\{ \left[R_{1}\left(t\right),\cdots,R_{S}\left(t\right)\right]\right\} \in\mathbb{R}^{Sm\times Sm}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With the group sensor method, the update phase of the Kalman Filter is just
+ like the normal Kalman Filter.
+ 
+\begin_inset Formula 
+\begin{eqnarray}
+K_{g} & = & PC_{g}^{\top}\left(C_{g}PC_{g}^{\top}+R_{g}\right)^{-1}\\
+\hat{x} & = & \hat{x}+K_{g}\left(y_{g}-C_{g}\hat{x}\right)\\
+P & = & \left(I-K_{g}C_{g}\right)P
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Sequential Kalman Filter
+\begin_inset CommandInset citation
+LatexCommand cite
+after "6.1"
+key "Simon2006"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Assume that at one time step we receive 
+\begin_inset Formula $S$
+\end_inset
+
+ measurements from different sensors.
+ We could recursively implement the update step of the Kalman Filter for
+ each measurement.
+ Let 
+\begin_inset Formula $z_{ik}$
+\end_inset
+
+ denote the ith measurement at time step 
+\begin_inset Formula $k$
+\end_inset
+
+, 
+\begin_inset Formula $C_{ik}$
+\end_inset
+
+ denote the observation matrix at time step 
+\begin_inset Formula $k$
+\end_inset
+
+ associated with measurement 
+\begin_inset Formula $i$
+\end_inset
+
+, 
+\begin_inset Formula $P_{ik|0k}$
+\end_inset
+
+ denote the error covariance at the time step 
+\begin_inset Formula $k$
+\end_inset
+
+ before 
+\begin_inset Formula $i$
+\end_inset
+
+th update, 
+\begin_inset Formula $P_{ik|ik}$
+\end_inset
+
+ denote the error covariance after the 
+\begin_inset Formula $i$
+\end_inset
+
+th update, 
+\begin_inset Formula $K_{ik}$
+\end_inset
+
+ denote the Kalman gain associated with measurement 
+\begin_inset Formula $i$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{x}_{ik|0k}$
+\end_inset
+
+ denote the estimated state before the update with measurement 
+\begin_inset Formula $i$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{x}_{ik|ik}$
+\end_inset
+
+ denote the estimated state after the update with measurement 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ The algorithm below outlines the sequential Kalman Filter.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $i=1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $P_{1k|0k}=P_{k|j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{x}_{1k|0k}=\hat{x}_{k|j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+while 
+\begin_inset Formula $i<S$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $K_{ik}=P_{ik|\left(i-1\right)k}C_{ik}^{\top}\left(C_{ik}P_{ik|\left(i-1\right)k}C_{ik}^{\top}+R_{ik}\right)^{-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{x}_{ik|ik}=\hat{x}_{ik|\left(i-1\right)k}+K_{ik}\left(z_{ik}-C_{ik}\hat{x}_{ik|\left(i-1\right)k}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $P_{ik|k}=\left(I-K_{ik}C_{ik}\right)P_{ik|\left(i-1\right)k}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $i+=1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+endwhile 
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{x}_{k|k}=\hat{x}_{Sk|Sk}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $P_{k|k}=P_{Sk|Sk}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Sequential Updating
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can easily analyze the affect of multiple measurements in a single time
+ step on the error covariance.
+ But first we will transform the error covariance update into a different
+ form.
+\begin_inset Formula 
+\begin{align}
+P_{k|k} & =\left(I-K_{k}C_{k}\right)P_{k|j}\\
+ & =\left(P_{k|j}-P_{k|j}C_{k}^{\top}\left(C_{k}P_{k|j}C_{k}^{\top}+R_{k}\right)^{-1}C_{k}P_{k|j}\right)
+\end{align}
+
+\end_inset
+
+Using the inversion lemma in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Inversion-Lemma"
+
+\end_inset
+
+ we get
+\begin_inset Formula 
+\begin{equation}
+\left(C_{k}R_{k}^{-1}C_{k}^{\top}+P_{k|j}^{-1}\right)^{-1}=P_{k|j}-P_{k|j}C_{k}^{\top}\left(C_{k}P_{k|j}C_{k}^{\top}+R_{k}\right)^{-1}C_{k}P_{k|j}.
+\end{equation}
+
+\end_inset
+
+Substituting this equation into the original yields
+\begin_inset Formula 
+\begin{align}
+P_{k|k} & =\left(C_{k}R_{k}^{-1}C_{k}^{\top}+P_{k|j}^{-1}\right)^{-1}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The error covariance after the first measurement at time step 
+\begin_inset Formula $k$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+P_{1k|1k}=\left(C_{1k}R_{1k}^{-1}C_{1k}^{\top}+P_{1k|0k}^{-1}\right)^{-1}
+\end{equation}
+
+\end_inset
+
+and after the second measurement is 
+\begin_inset Formula 
+\begin{align}
+P_{2k|2k} & =\left(C_{2k}R_{2k}^{-1}C_{2k}^{\top}+P_{1k|1k}^{-1}\right)^{-1}\\
+ & =\left(C_{2k}R_{2k}^{-1}C_{2k}^{\top}+C_{1k}R_{1k}^{-1}C_{1k}^{\top}+P_{1k|0k}^{-1}\right)^{-1}
+\end{align}
+
+\end_inset
+
+If the observation matrices are the same, the above equation reduces to
+ 
+\begin_inset Formula 
+\[
+P_{2k|2k}=\left(C_{1k}\left(R_{2k}^{-1}+R_{1k}^{-1}\right)C_{1k}^{\top}+P_{1k|0k}^{-1}\right)^{-1}
+\]
+
+\end_inset
+
+and if the measurement noise covariance is the same, then the equation reduces
+ to 
+\begin_inset Formula 
+\[
+P_{2k|2k}=\left(2C_{1k}\left(R_{1k}^{-1}\right)C_{1k}^{\top}+P_{1k|0k}^{-1}\right)^{-1}.
+\]
+
+\end_inset
+
+ For 
+\begin_inset Formula $S$
+\end_inset
+
+ measurements with same observation matrix and measurement covariance, the
+ error covariance is 
+\begin_inset Formula 
+\[
+P_{Sk|Sk}=\left(SC_{1k}\left(R_{1k}^{-1}\right)C_{1k}^{\top}+P_{1k|0k}^{-1}\right).^{-1}
+\]
+
+\end_inset
+
+This same error covariance form multiple measurements is derived in subsection
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:How-Multiple-Measurements"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Sequential Sensor Method
+\end_layout
+
+\begin_layout Standard
+This method allows for asynchronous measurements from multiple sensors.
+ Let 
+\begin_inset Formula $S$
+\end_inset
+
+ represent the number of sensors.
+ When a measurement 
+\begin_inset Formula $z_{p},\:1<p\leq S$
+\end_inset
+
+ from the pth sensor is received, the estimate 
+\begin_inset Formula $\hat{x}$
+\end_inset
+
+ is propagated to the current time using the prediction step of the Kalman
+ Filter.
+ Then the new measurement 
+\begin_inset Formula $z_{p}$
+\end_inset
+
+ is used in the update phase of the Kalman Filter.
+ If there are multiple measurements at a given time, then the Group Sensor
+ Method, as discussed in subsection 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Group-Sensor-Method"
+
+\end_inset
+
+, can be used with the Sequential Sensor Method to fuse multiple observations
+ at a given time.
+ 
+\end_layout
+
+\begin_layout Standard
+For example, at time 
+\begin_inset Formula $k$
+\end_inset
+
+ we receive measurements 
+\begin_inset Formula $z_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $z_{3}$
+\end_inset
+
+, 
+\begin_inset Formula $z_{5a}$
+\end_inset
+
+, 
+\begin_inset Formula $z_{5b}$
+\end_inset
+
+ from sensors 
+\begin_inset Formula $1,3,5$
+\end_inset
+
+ but not from any other sensor.
+ Note that sensor 
+\begin_inset Formula $5$
+\end_inset
+
+ produced two measurements 
+\begin_inset Formula $z_{5a}$
+\end_inset
+
+ and 
+\begin_inset Formula $z_{5b}$
+\end_inset
+
+.
+ The first step is to propagate 
+\begin_inset Formula $\hat{x}\left(k-1\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $P\left(k-1\right)$
+\end_inset
+
+ forward using the prediction step of the Kalman Filter to get 
+\begin_inset Formula $\hat{x}\left(k|k-1\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $P$
+\end_inset
+
+
+\begin_inset Formula $\left(k|k-1\right)$
+\end_inset
+
+.
+ Next the update step is performed using the Group Update method or the
+ Sequential update method.
+\end_layout
+
+\begin_layout Subsection
+How Multiple Measurements Affect the Error Covariance
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:How-Multiple-Measurements"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When the Kalman Filter only has one measurement source 
+\begin_inset Formula $z$
+\end_inset
+
+ then using Bayes' rule we get
+\begin_inset Formula 
+\begin{equation}
+p\left(x|z\right)=\frac{p\left(z|x\right)p\left(x\right)}{p\left(z\right)}.
+\end{equation}
+
+\end_inset
+
+When we have multiple measurement sources 
+\begin_inset Formula $z_{i}$
+\end_inset
+
+, then using Bayes' rule we get 
+\begin_inset Formula 
+\begin{equation}
+p\left(x|z_{i=1,\ldots N}\right)=\frac{p\left(x\right)p\left(z_{i=1,\ldots N}|x\right)}{p\left(z_{i=1,\ldots N}\right)}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $z_{i=1,\ldots N}$
+\end_inset
+
+ denotes the intersection of the probability spaces.
+ 
+\end_layout
+
+\begin_layout Standard
+We recall that 
+\begin_inset Formula 
+\begin{equation}
+z=C\left(t\right)x\left(t\right)+\mathbf{V}\left(t\right)
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $z\sim\mathcal{N}$
+\end_inset
+
+
+\begin_inset Formula $\left(C\left(t\right)x\left(t\right),R\right)$
+\end_inset
+
+ and assumed to be independent from other measurements.
+ This allows us to write
+\begin_inset Formula 
+\begin{equation}
+p\left(x|z_{i=1,\ldots N}\right)=\frac{p\left(x\right)\Pi_{i=1}^{N}p\left(z_{i}|x\right)}{\Pi_{i=1}^{N}p\left(z_{i}\right)}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Pi_{i=1}^{N}p\left(z_{i}|x\right)$
+\end_inset
+
+ is the product of multivariate Gaussian probability density functions.
+ Using Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Product-of-Gaussian"
+
+\end_inset
+
+, we get
+\begin_inset Formula 
+\begin{align*}
+p\left(Z|x\right) & =\Pi_{i=1}^{N}p\left(z_{i}|x\right)\\
+ & =\frac{1}{\sqrt{\left(2\pi\right)^{nN}\det\left(R\right)^{N}}}\exp\left(-\frac{1}{2}\left(z-\mu_{c}\right)^{\top}R_{c}^{-1}\left(x-\mu_{c}\right)\right)
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align}
+\mu_{c} & =C\left(t\right)x\left(t\right)\\
+R_{c}^{-1} & =\sum_{i=1}^{N}R_{i}^{-1}\\
+R_{c} & =\frac{1}{N}R.
+\end{align}
+
+\end_inset
+
+Note that the mean stays the same, but the covariance 
+\begin_inset Formula $p\left(Z|x\right)$
+\end_inset
+
+ is smaller then any single 
+\begin_inset Formula $p\left(z_{i}|x\right)$
+\end_inset
+
+.
+ Intuitively this means that multiple measurements can be combined together
+ and form a new measurement that has a smaller covariance, and the smaller
+ the covariance is, the better our estimate of 
+\begin_inset Formula $x$
+\end_inset
+
+ will be.
+ To show this we reference 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "3.2"
+key "Thrun2006a"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The Kalman Filter is designed to maximize 
+\begin_inset Formula $p\left(x|Z\right)\sim\mathcal{N}\left(\hat{x},P\right)$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{equation}
+p\left(x|Z\right)=\frac{p\left(z|Z\right)p\left(x\right)}{p\left(Z\right)}=\eta\exp\left(-J\right)
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+J=\frac{1}{2}\left(z-Cx\right)^{\top}R_{c}^{-1}\left(x-Cx\right)+\frac{1}{2}\left(x-\hat{x}\right)^{\top}\bar{P}^{-1}\left(x-\hat{x}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Maximizing 
+\begin_inset Formula $p\left(x|Z\right)$
+\end_inset
+
+ is done by maximizing 
+\begin_inset Formula $J$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ We do this by taking the first and second derivatives of 
+\begin_inset Formula $J$
+\end_inset
+
+ w.r.t.
+ 
+\begin_inset Formula $x$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align}
+\frac{\partial J}{\partial x} & =-C{}^{\top}R_{c}^{-1}\left(z_{c}-Cx\right)+P^{-1}\left(x-\hat{x}\right)\\
+\frac{\partial^{2}J}{\partial x^{2}} & =C^{\top}R_{c}^{-1}C+\bar{P}^{-1}
+\end{align}
+
+\end_inset
+
+The first term is used to calculate the mean, and the second term gives
+ us the new covariance.
+\begin_inset Formula 
+\begin{align}
+P & =\left(C^{\top}R_{c}^{-1}C+\bar{P}^{-1}\right)^{-1}\\
+ & =\left(NC^{\top}R^{-1}C+\bar{P}^{-1}\right)^{-1}\\
+x & =\hat{x}+PC^{T}R_{c}^{-1}\left(Z-C\hat{x}\right).
+\end{align}
+
+\end_inset
+
+Notice that the smaller 
+\begin_inset Formula $R_{c}$
+\end_inset
+
+ is, the smaller 
+\begin_inset Formula $P$
+\end_inset
+
+ is.
+ Also note that the smaller 
+\begin_inset Formula $R_{c}$
+\end_inset
+
+ is, then the larger the update for 
+\begin_inset Formula $x$
+\end_inset
+
+ will be, i.e.
+ the larger the step will be.
+ Thus multiple measurements will lead to a faster convergence and a smaller
+ estimation error.
+ 
+\end_layout
+
+\begin_layout Standard
+We cannot be more detailed about the affect of 
+\begin_inset Formula $R_{c}$
+\end_inset
+
+ unless the system is LTI.
+ In this case the value of 
+\begin_inset Formula $P_{t\to\infty}$
+\end_inset
+
+ can be calculated using the Matrix Differential Riccati Equation which
+ I will not go into at the moment.
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Inversion Lemma 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thrun2006"
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Inversion-Lemma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For any invertible quadratic matrices 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+ and matrix 
+\begin_inset Formula $C$
+\end_inset
+
+ with appropriate dimensions, the following is true
+\begin_inset Formula 
+\begin{equation}
+\left(A+CBC^{\top}\right)=A^{-1}-A^{-1}C\left(B^{-1}+C^{\top}A^{-1}C\right)^{-1}C^{\top}A^{-1}
+\end{equation}
+
+\end_inset
+
+assuming that all matrices that are inverted can be inverted.
+\end_layout
+
+\begin_layout Proof
+Define 
+\begin_inset Formula $Y=\left(B^{-1}+C^{\top}A^{-1}C\right)^{-1}$
+\end_inset
+
+.
+ It suffices to show that 
+\begin_inset Formula 
+\begin{equation}
+\left(A^{-1}-A^{-1}CYC^{\top}A^{-1}\right)\left(A+CBC^{\top}\right)=I
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proof
+We begin by factoring
+\begin_inset Formula 
+\begin{equation}
+A^{-1}A+A^{-1}CBC^{\top}-A^{-1}CYC^{\top}A^{-1}A-A^{-1}CYC^{\top}A^{-1}CBC^{\top}
+\end{equation}
+
+\end_inset
+
+then we simplify noting 
+\begin_inset Formula $A^{-1}A=I$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+= & I+A^{-1}CBC^{\top}-A^{-1}CYC^{\top}-A^{-1}CYC^{\top}A^{-1}CBC^{\top}\\
+= & I+A^{-1}C\left(BC^{\top}-YC^{\top}-YC^{\top}A^{-1}CBC^{\top}\right)\\
+= & I+A^{-1}C\left(BC^{\top}-YB^{-1}BC^{\top}-YC^{\top}A^{-1}CBC^{\top}\right)\\
+= & I+A^{-1}C\left(BC^{\top}-Y\left(B^{-1}+C^{\top}A^{-1}C\right)BC^{\top}\right)\\
+= & I+A^{-1}C\left(BC^{\top}-YY^{-1}BC^{\top}\right)\\
+= & I+A^{-1}C\left(BC^{\top}-BC^{\top}\right)\\
+= & I
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Rearranging Into Squared Form 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Rearranging-Into-Squared"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+after "8.1.6"
+key "Petersen2008"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $A\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ is symmetric, then
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}x^{\top}Ax+b^{\top}x=-\frac{1}{2}\left(x-A^{-1}b\right)^{\top}A\left(x-A^{-1}b\right)+\frac{1}{2}b^{\top}A^{-1}b
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Sum of Two Squared Forms
+\begin_inset CommandInset citation
+LatexCommand cite
+after "8.1.7"
+key "Petersen2008"
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Sum-of-Two"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $R_{1},R_{2}\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ are symmetric, 
+\begin_inset Formula $x\in\mathbb{R}^{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu\in\mathbb{R}^{n}$
+\end_inset
+
+ then the sum of two squared forms of type 
+\begin_inset Formula $\frac{1}{2}\left(x-\mu_{i}\right)^{\top}R_{i}^{-1}\left(x-\mu_{i}\right)$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}\left(x-\mu_{1}\right)^{\top}R_{1}^{-1}\left(x-\mu_{1}\right)-\frac{1}{2}\left(x-\mu_{2}\right)^{\top}R_{2}^{-1}\left(x-\mu_{2}\right)
+\end{equation}
+
+\end_inset
+
+factoring the equation we get
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}\left(x^{\top}R_{1}^{-1}x+\mu_{1}^{\top}R_{1}^{-1}\mu_{1}-2\mu_{1}^{\top}R_{1}^{-1}x+x^{\top}R_{2}^{-1}x+\mu_{2}^{\top}R_{2}^{-1}\mu_{2}-2\mu_{2}^{\top}R_{2}^{-1}x_{2}\right)
+\end{equation}
+
+\end_inset
+
+which is simplified to
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}x^{\top}\left(R_{1}^{-1}+R_{2}^{-1}\right)x+\left(\mu_{1}^{\top}R_{1}^{-1}+\mu_{2}^{\top}R_{2}^{-1}\right)x-\frac{1}{2}\left(\mu_{1}^{\top}R_{1}^{-1}\mu_{1}+\mu_{2}^{\top}R_{2}^{-1}\mu_{2}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and using the property shown in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Rearranging-Into-Squared"
+
+\end_inset
+
+ we get 
+\begin_inset Formula 
+\begin{multline}
+-\frac{1}{2}\left(x-\left(R_{1}^{-1}+R_{2}^{-1}\right)^{-1}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)\right)^{\top}\left(R_{1}^{-1}+R_{2}^{-1}\right)\left(x-\left(R_{1}^{-1}+R_{2}^{-1}\right)^{-1}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)\right)\\
++\frac{1}{2}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)^{\top}\left(R_{1}^{-1}+R_{2}^{-1}\right)^{-1}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)-\frac{1}{2}\left(\mu_{1}^{\top}R_{1}^{-1}\mu_{1}+\mu_{2}^{\top}R_{2}^{-1}\mu_{2}\right)
+\end{multline}
+
+\end_inset
+
+which can be expressed as 
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}\left(x-\mu_{c}\right)^{\top}R_{c}^{-1}\left(x-\mu_{c}\right)+C
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align}
+\mu_{c} & =\left(R_{1}^{-1}+R_{2}^{-1}\right)^{-1}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)\\
+R_{c}^{-1} & =\left(R_{1}^{-1}+R_{2}^{-1}\right)\\
+C= & \frac{1}{2}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)^{\top}\left(R_{1}^{-1}+R_{2}^{-1}\right)^{-1}\left(R_{1}^{-1}\mu_{i}+R_{2}^{-1}\mu_{2}\right)-\frac{1}{2}\left(\mu_{1}^{\top}R_{1}^{-1}\mu_{1}+\mu_{2}^{\top}R_{2}^{-1}\mu_{2}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Sum of N-Squared Forms
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Sum-of-N-Squared"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can apply the same concept shown in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Sum-of-Two"
+
+\end_inset
+
+ to a finite sum.
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $R_{i}\in\mathbb{R}^{n\times n}$
+\end_inset
+
+ be symmetric, 
+\begin_inset Formula $x\in\mathbb{R}^{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu_{i}\in\mathbb{R}^{n}$
+\end_inset
+
+ then the sum of N squared forms of type 
+\begin_inset Formula $\frac{1}{2}\left(x-\mu_{i}\right)^{\top}R_{i}^{-1}\left(x-\mu_{i}\right)$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{2}\left(x-\mu_{c}\right)^{\top}R_{c}^{-1}\left(x-\mu_{c}\right)+C
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align}
+\mu_{c} & =\left(\sum_{i=1}^{N}R_{i}^{-1}\right)^{-1}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)\\
+R_{c}^{-1} & =\sum_{i=1}^{N}R_{i}^{-1}\\
+C & =\frac{1}{2}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)^{\top}\left(\sum_{i=1}^{N}R_{i}^{-1}\right)^{-1}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)-\frac{1}{2}\left(\sum_{i=1}^{N}\mu_{i}^{\top}R_{i}^{-1}\mu_{i}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This can be shown using the property in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Sum-of-Two"
+
+\end_inset
+
+ recursively.
+\end_layout
+
+\begin_layout Section
+Product of Gaussian Densities
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Product-of-Gaussian"
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "8.1.8"
+key "Petersen2008"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathcal{N}_{x}\left(\mu_{i},R_{i}\right)$
+\end_inset
+
+ denote a multivariate Gaussian probability density function (PDF) of 
+\begin_inset Formula $x\in\mathbb{R}^{n}$
+\end_inset
+
+ with mean 
+\begin_inset Formula $\mu_{i}\in\mathbb{R}^{n}$
+\end_inset
+
+ and symmetric covariance 
+\begin_inset Formula $R_{i}\in\mathbb{R}^{n\times n}$
+\end_inset
+
+.
+ The product of the Gaussian PDF can be calculated using the property from
+ Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Sum-of-N-Squared"
+
+\end_inset
+
+.
+ We show this by first writing
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Pi_{i=1}^{N}\mathcal{N}_{x}\left(\mu_{i},R_{i}\right)=\Pi_{i=1}^{N}\frac{1}{\sqrt{\left(2\pi\right)^{n}\det\left(R_{i}\right)}}\exp\left(-\frac{1}{2}\left(x-\mu_{i}\right)^{\top}R_{i}^{-1}\left(x-\mu_{i}\right)\right).
+\end{equation}
+
+\end_inset
+
+Since the product of exponents is just the sum of the terms inside of them
+ to the exponent, i.e.
+ 
+\begin_inset Formula $e^{a}*e^{b}=e^{a+b}$
+\end_inset
+
+, then the new term inside the exponent is the sum of N-squared forms 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Sum-of-N-Squared"
+
+\end_inset
+
+.
+ Thus
+\begin_inset Formula 
+\begin{equation}
+\Pi_{i=1}^{N}\mathcal{N}_{x}\left(\mu_{i},R_{i}\right)=\frac{\exp\left(C\right)}{\sqrt{\left(2\pi\right)^{nN}\Pi_{i=1}^{N}\det\left(R_{i}\right)}}\exp\left(-\frac{1}{2}\left(x-\mu_{c}\right)^{\top}R_{c}^{-1}\left(x-\mu_{c}\right)\right)
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align}
+\mu_{c} & =\left(\sum_{i=1}^{N}R_{i}^{-1}\right)^{-1}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)\\
+R_{c}^{-1} & =\sum_{i=1}^{N}R_{i}^{-1}\\
+C & =\frac{1}{2}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)^{\top}\left(\sum_{i=1}^{N}R_{i}^{-1}\right)^{-1}\left(\sum_{i=1}^{N}R_{i}^{-1}\mu_{i}\right)-\frac{1}{2}\left(\sum_{i=1}^{N}\mu_{i}^{\top}R_{i}^{-1}\mu_{i}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We note that if the mean 
+\begin_inset Formula $\mu_{i}$
+\end_inset
+
+ is the same for every 
+\begin_inset Formula $i$
+\end_inset
+
+, then 
+\begin_inset Formula 
+\begin{align}
+\mu_{c} & =\mu_{i}\\
+R_{c}^{-1} & =\sum_{i=1}^{N}R_{i}^{-1}\\
+C & =0
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/mark/Documents/mendeley/library"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

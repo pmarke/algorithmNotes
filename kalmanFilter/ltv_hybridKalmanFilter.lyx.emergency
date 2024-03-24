@@ -1,0 +1,660 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+LTV Hybrid Kalman Filter
+\end_layout
+
+\begin_layout Section
+Discrete Kalman Filter
+\end_layout
+
+\begin_layout Standard
+A generic discrete linear time-varying (LTV) system can be written in the
+ form
+\begin_inset Formula 
+\begin{eqnarray}
+x_{k} & = & A_{k}x_{k-1}+B_{k}u_{k}+G\mathbf{w}_{k}\label{eq:discrete_system}\\
+y_{k} & = & C_{k}x+\mathbf{v}_{k}\label{eq:discrete_output}
+\end{eqnarray}
+
+\end_inset
+
+with 
+\begin_inset Formula $x\in\mathbb{\mathbb{R}}^{n}$
+\end_inset
+
+ as the state vector, 
+\begin_inset Formula $u\in\mathbb{R}^{m}$
+\end_inset
+
+ as the input vector, 
+\begin_inset Formula $y\in\mathbb{R}^{s}$
+\end_inset
+
+ as the output vector, 
+\begin_inset Formula $A\in\mathbb{R}^{nxn}$
+\end_inset
+
+ as the system matrix, 
+\begin_inset Formula $B\in\mathbb{R}^{nxm}$
+\end_inset
+
+ as the input matrix and 
+\begin_inset Formula $C\in\mathbb{R}^{sxn}$
+\end_inset
+
+ as the observation matrix.
+ 
+\begin_inset Formula $\mathbf{v}\sim\mathcal{N}\left(0,R\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{w}\sim\mathcal{N}\left(0,Q\right)$
+\end_inset
+
+ are multivariate white noise processes that represent measurement and process
+ noise, and 
+\begin_inset Formula $G$
+\end_inset
+
+ is the constant matrix that defines how the process noise 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ acts on the system.
+ 
+\end_layout
+
+\begin_layout Standard
+The Kalman Filter is a recursive estimator used to estimate the state 
+\begin_inset Formula $x$
+\end_inset
+
+ based off of previous states and measurements.
+ It uses Bayesian inference to maximize the probability of the estimate
+ of 
+\begin_inset Formula $x$
+\end_inset
+
+ given the measurement 
+\begin_inset Formula $y$
+\end_inset
+
+, and it is represented by two variables 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\hat{x}_{k|j}$
+\end_inset
+
+ The expected value, estimate, of 
+\begin_inset Formula $x$
+\end_inset
+
+ at time 
+\begin_inset Formula $k$
+\end_inset
+
+ given measurements up to and including time 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $P_{k|j}$
+\end_inset
+
+ The estimate covariance at time 
+\begin_inset Formula $k$
+\end_inset
+
+ given measurements up to and including time 
+\begin_inset Formula $j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $k>j$
+\end_inset
+
+, the probability of 
+\begin_inset Formula $x_{k|j}$
+\end_inset
+
+,
+\begin_inset Formula $P\left(x\right)$
+\end_inset
+
+, is referred to the prior probability.
+ When a measurement is received, the probability of 
+\begin_inset Formula $y$
+\end_inset
+
+ given 
+\begin_inset Formula $x$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(y|x\right)$
+\end_inset
+
+, is constructed and referred to the likelihood.
+ The objective of the Kalman Filter is to maximize the posterior probability
+ or the probability of 
+\begin_inset Formula $x$
+\end_inset
+
+ given 
+\begin_inset Formula $y$
+\end_inset
+
+, 
+\begin_inset Formula $P\left(y|x\right)$
+\end_inset
+
+, in two phases: a prediction phase and an update phase.
+ 
+\end_layout
+
+\begin_layout Standard
+The prediction phase propagates the state dynamics and the error covariance.
+\begin_inset Formula 
+\begin{eqnarray}
+\hat{x}_{k|j} & = & A_{k}\hat{x}_{k-1|j}+B_{k}u_{k}\label{eq:predict_xhat}\\
+P_{k|j} & = & A_{k}P_{k-1|j}A_{k}^{\top}+GQ_{k}G^{\top}\label{eq:DRE}
+\end{eqnarray}
+
+\end_inset
+
+note that equation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DRE"
+
+\end_inset
+
+is a Discrete Riccati Equation with 
+\begin_inset Formula $P$
+\end_inset
+
+ being positive definite and 
+\begin_inset Formula $Q$
+\end_inset
+
+ semi-positive definite.
+\end_layout
+
+\begin_layout Standard
+The update phase adjusts the state estimate and the estimate covariance
+ to maximize the posterior probability.
+ At the end of this update step 
+\begin_inset Formula $j=k$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{eqnarray}
+K_{k} & = & P_{k}C_{k}^{\top}\left(C_{k}P_{k}C_{k}^{\top}+R_{k}\right)^{-1}\label{eq:kalman_gain}\\
+\hat{x}_{k|k=j} & = & \hat{x}_{k|j}+K_{k}\left(y_{k}-C_{k}\hat{x}_{k|j}\right)\label{eq:xhat_update}\\
+P_{k|j} & = & \left(I-K_{k}C_{k}\right)P_{k|j}\label{eq:estimate_cov_update}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Continuous Kalman Filter
+\end_layout
+
+\begin_layout Standard
+A generic continuous linear time-varying (LTV) system can be written in
+ the form
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{x} & = & A\left(t\right)x+B\left(t\right)u+G\mathbf{w}\left(t\right)\label{eq:cont_system}\\
+y & = & C\left(t\right)x+\mathbf{v}\left(t\right)\label{eq:cont_output}
+\end{eqnarray}
+
+\end_inset
+
+where 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont_system"
+
+\end_inset
+
+and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont_output"
+
+\end_inset
+
+are the continuous version of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discrete_system"
+
+\end_inset
+
+and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:discrete_output"
+
+\end_inset
+
+.
+ The update phase for the continuous Kalman filter is the same as the discrete
+ Kalman filter, but the prediction phases are different.
+\end_layout
+
+\begin_layout Standard
+The prediction phase for the continuous Kalman filter is
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{\hat{x}}\left(t\right) & = & A\left(t\right)\hat{x}\left(t\right)+B\left(t\right)u\left(t\right)\label{eq:predict_xhat_d}\\
+\Rightarrow\hat{x}_{k|j} & = & \hat{x}\left(t\right)\nonumber \\
+\dot{P}\left(t\right) & = & A\left(t\right)P\left(t\right)+P\left(t\right)A^{\top}\left(t\right)+Q\left(t\right)\label{eq:CRE}\\
+\Rightarrow P_{k|j} & = & P\left(t\right)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Hybrid Kalman Filter
+\end_layout
+
+\begin_layout Standard
+Sometimes when numerically integrating 
+\begin_inset Formula $P$
+\end_inset
+
+ using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:CRE"
+
+\end_inset
+
+, 
+\begin_inset Formula $P$
+\end_inset
+
+ can diverge from being positive definite.
+ Also, 
+\begin_inset Formula $P\in\mathbb{R}^{nxn}$
+\end_inset
+
+ and can become very large when the number of states is very large.
+ Numerically integrating 
+\begin_inset Formula $P$
+\end_inset
+
+ with many elements can be slow and inaccurate.
+ The solution is to transform 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:CRE"
+
+\end_inset
+
+to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DRE"
+
+\end_inset
+
+ by approximating the state transition matrix, 
+\begin_inset Formula $\Phi\left(t,t_{0}\right)$
+\end_inset
+
+ of 
+\begin_inset Formula $A\left(t\right)$
+\end_inset
+
+ and transforming 
+\begin_inset Formula $Q\left(t\right)$
+\end_inset
+
+ to 
+\begin_inset Formula $Q_{k}$
+\end_inset
+
+ such that.
+\begin_inset Formula 
+\[
+P_{k|j}=\Phi\left(k,k-1\right)P_{k-1|j}\Phi\left(k,k-1\right)+GQ_{k}G^{\top}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The state transition matrix is defined as
+\begin_inset Formula 
+\begin{align*}
+\Phi\left(t,t_{0}\right) & =I+\int_{t_{0}}^{t}A\left(s_{1}\right)ds_{1}+\int_{t_{0}}^{t}A\left(s_{1}\right)\int_{t_{0}}^{s_{1}}A\left(s_{2}\right)ds_{2}ds_{1}+\\
+ & =\int_{t_{0}}^{t}A\left(s_{1}\right)\int_{t_{0}}^{s_{1}}A\left(s_{2}\right)\int_{t_{0}}^{s_{2}}A\left(s_{2}\right)ds_{3}ds_{2}ds_{1}\ldots
+\end{align*}
+
+\end_inset
+
+.
+ For Linear Time-Invariant (LTI) systems, the state transition matrix is
+\begin_inset Formula 
+\begin{eqnarray*}
+\Phi\left(t,t_{0}\right) & = & \exp^{A\left(t-t_{0}\right)}\\
+ & = & \sum_{k=0}^{\infty}\frac{\left(t-t_{0}\right)}{k!}A^{k}\\
+ & = & \sum_{k=0}^{\infty}\frac{\Delta t}{k!}A^{k}\\
+ & \approx & I+A\Delta t+\frac{\left(A\Delta t\right)^{2}}{2}+\frac{\left(A\Delta t\right)^{3}}{6}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discrete white noise process 
+\begin_inset Formula $\mathbf{w}_{k}$
+\end_inset
+
+ can be calculated from the continuous white noise process 
+\begin_inset Formula $\mathbf{w}\left(t\right)$
+\end_inset
+
+.
+ First we note a few properties
+\begin_inset Formula 
+\begin{eqnarray}
+E\left[\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}\left(\alpha\right)\right] & = & Q\left(\tau\right)\delta\left(\tau-\alpha\right)\label{eq:Q_t}\\
+E\left[\mathbf{w}_{k}\mathbf{w}_{k}^{\top}\right] & = & Q_{k}\label{eq:Q_k}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and that 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cont_system"
+
+\end_inset
+
+can be converted into a discrete system of the form
+\begin_inset Formula 
+\begin{eqnarray*}
+x_{k} & = & \Phi\left(k,k-1\right)x_{k}+\int_{k-1}^{k}\Phi\left(k,\tau\right)B\left(\tau\right)u\left(\tau\right)d\tau+\int_{k-1}^{k}\Phi\left(k,\tau\right)G\mathbf{w}\left(\tau\right)d\tau\\
+x_{k} & = & \Phi\left(k,k-1\right)x_{k}+\int_{k-1}^{k}\Phi\left(k,\tau\right)B\left(\tau\right)u\left(\tau\right)d\tau+\mathbf{w}_{k}
+\end{eqnarray*}
+
+\end_inset
+
+thus
+\begin_inset Formula 
+\begin{equation}
+\mathbf{w}_{k}=\int_{k-1}^{k}\Phi\left(k,\tau\right)\mathbf{w}\left(\tau\right)d\tau\label{eq:wk_wt}
+\end{equation}
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Q_{k}$
+\end_inset
+
+ can now be solved in terms of 
+\begin_inset Formula $Q\left(t\right)$
+\end_inset
+
+ by substituting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:wk_wt"
+
+\end_inset
+
+into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Q_k"
+
+\end_inset
+
+ and using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Q_t"
+
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray}
+Q_{k} & = & E\left[\mathbf{w}_{k}\mathbf{w}_{k}^{\top}\right]\nonumber \\
+ & = & E\left[\int_{k-1}^{k}\Phi\left(k,\tau\right)G\mathbf{w}\left(\tau\right)\left(\int_{k-1}^{k}\Phi\left(k,\alpha\right)G\mathbf{w}\left(\alpha\right)d\alpha\right)^{\top}d\tau\right]\nonumber \\
+ & = & E\left[\int_{k-1}^{k}\int_{k-1}^{k}\Phi\left(k,\tau\right)G\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}G^{\top}\left(\alpha\right)\Phi\left(k,\alpha\right)^{\top}d\tau d\alpha\right]\nonumber \\
+ & = & \int_{k-1}^{k}\int_{k-1}^{k}\Phi\left(k,\tau\right)GE\left[\mathbf{w}\left(\tau\right)\mathbf{w}^{\top}\left(\alpha\right)\right]G^{\top}\Phi\left(k,\alpha\right)^{\top}d\tau d\alpha\nonumber \\
+ & = & \int_{k-1}^{k}\int_{k-1}^{k}\Phi\left(k,\tau\right)GQ\left(\tau\right)\delta\left(\tau-\alpha\right)G^{\top}\Phi\left(k,\alpha\right)^{\top}d\tau d\alpha\nonumber \\
+ & = & \int_{k-1}^{k}\Phi\left(k,\tau\right)GQ\left(\tau\right)G^{\top}\Phi\left(k,\tau\right)^{\top}d\tau\label{eq:Qt_to_Qk}
+\end{eqnarray}
+
+\end_inset
+
+If 
+\begin_inset Formula $Q\left(t\right)$
+\end_inset
+
+ is a constant and the system is LTI, then 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Qt_to_Qk"
+
+\end_inset
+
+ can be reduced to
+\begin_inset Formula 
+\begin{equation}
+Q_{k}=\int_{0}^{\Delta t}\exp^{A\Delta t}GQG^{\top}\exp^{A^{\top}\Delta t}d\tau\label{eq:Qt_to_Qk_LTI}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ is the time step between 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $k-1$
+\end_inset
+
+.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Qt_to_Qk_LTI"
+
+\end_inset
+
+ can be approximated by
+\begin_inset Formula 
+\begin{align*}
+Q_{k} & =\int_{0}^{\Delta t}\exp^{A\Delta t}GQG^{\top}\exp^{A^{\top}\Delta t}d\tau\\
+ & =\int_{0}^{\Delta t}\left(\sum_{k=0}^{\infty}\frac{\tau}{k!}A^{k}\right)GQG^{\top}\left(\sum_{k=0}^{\infty}\frac{\tau}{k!}A^{k}\right)d\tau\\
+ & =\int_{0}^{\Delta t}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\cdots+\frac{A^{n}\left(\tau\right)^{n}}{n!}\right)GQG^{\top}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\cdots+\frac{A^{n}\left(\tau\right)^{n}}{n!}\right)^{\top}d\tau\\
+ & \approx\int_{0}^{\Delta t}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\frac{A^{3}\left(\tau\right)^{3}}{2}\right)GQG^{\top}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\frac{A^{3}\left(\tau\right)^{3}}{2}\right)^{\top}d\tau
+\end{align*}
+
+\end_inset
+
+removing higher order terms we get
+\begin_inset Formula 
+\[
+Q_{k}\approx\int_{0}^{\Delta t}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\frac{A^{3}\left(\tau\right)^{3}}{2}\right)GQG^{\top}\left(I+A\tau+\frac{A^{2}\left(\tau\right)^{2}}{2}+\frac{A^{3}\left(\tau\right)^{3}}{2}\right)^{\top}d\tau
+\]
+
+\end_inset
+
+expanding the equation we get
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx\int_{0}^{\Delta t}(IHI+IHA^{\top}\tau+\frac{IHA^{\top^{2}}\left(\tau\right)^{2}}{2}+\frac{IHA^{\top^{3}}\left(\tau\right)^{3}}{2}\\
++A\tau HI+A\tau HA^{\top}\tau+\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+A\Delta tGQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}I+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}A^{\top}\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}I+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}A^{\top}\Delta t+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2})d\tau
+\end{multline*}
+
+\end_inset
+
+removing higher order terms we get
+\begin_inset Formula 
+\begin{multline*}
+Q_{k}\approx\int_{0}^{\Delta t}(IGQG^{\top}I+IGQG^{\top}A^{\top}\Delta t+IGQG^{\top}\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+IGQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++AGQG^{\top}I+A\Delta tGQG^{\top}A^{\top}\Delta t+A\Delta t\frac{A^{\top^{2}}\left(\Delta t\right)^{3}}{2}\\
++\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}I+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}A^{\top}\Delta t+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{2}\left(\Delta t\right)^{2}}{2}GQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2}\\
++\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}I+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}A^{\top}\Delta t+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}\frac{A^{\top^{2}}\left(\Delta t\right)^{2}}{2}+\frac{A^{3}\left(\Delta t\right)^{3}}{2}GQG^{\top}\frac{A^{\top^{3}}\left(\Delta t\right)^{3}}{2})d\tau
+\end{multline*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, the prediction phase for the hybrid Kalman Filter becomes
+\begin_inset Formula 
+\begin{eqnarray*}
+\dot{\hat{x}}\left(t\right) & = & A\left(t\right)\hat{x}\left(t\right)+B\left(t\right)u\left(t\right)\\
+P_{k|j} & = & \Phi\left(k,k-1\right)P_{k-1|j}\Phi\left(k,k-1\right)_{k}^{\top}+GQ_{k}
+\end{eqnarray*}
+
+\end_inset
+
+and the update phase is the same for the discrete case.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+L.
+ Ljung, “Asymptotic behavior of the extended Kalman filter as a parameter
+ estimator for linear systems,” IEEE Trans.
+ Automat.
+ Contr., AC-24, pp.
+ 36–50, 1979.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+H.
+ Kwakernaak and R.
+ Sivan, Linea Optimal Control Systems, Wley-Interscience, New York, 1972.
+\end_layout
+
+\end_body
+\end_document
